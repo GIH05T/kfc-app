@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kinder Ferien Club Anmeldung</title>
+  <link rel="manifest" href="manifest.json" />
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+      max-width: 500px;
+      margin: auto;
+    }
+    input, button {
+      width: 100%;
+      margin: 8px 0;
+      padding: 10px;
+      font-size: 1em;
+    }
+    #qrcode {
+      margin-top: 20px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <h1>Anmeldung Ferien Club</h1>
+  <form id="signupForm">
+    <label>Vorname Kind*</label>
+    <input type="text" id="childName" required />
+
+    <label>Name Eltern*</label>
+    <input type="text" id="parentName" required />
+
+    <label>E-Mail*</label>
+    <input type="email" id="email" required />
+
+    <button type="submit">Anmelden</button>
+  </form>
+
+  <div id="qrcode"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+  <script>
+    const form = document.getElementById('signupForm');
+    const qrDiv = document.getElementById('qrcode');
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const childName = document.getElementById('childName').value;
+      const parentName = document.getElementById('parentName').value;
+      const email = document.getElementById('email').value;
+
+      const data = {
+        childName,
+        parentName,
+        email,
+        timestamp: new Date().toISOString()
+      };
+
+      // QR-Code erzeugen (lokal, kein Server nötig)
+      qrDiv.innerHTML = "";
+      QRCode.toCanvas(JSON.stringify(data), { width: 200 }, function (err, canvas) {
+        if (err) console.error(err);
+        qrDiv.appendChild(canvas);
+      });
+
+      alert("Anmeldung gespeichert (lokal)! QR-Code ist unten sichtbar.");
+    });
+  </script>
+</body>
+</html>
