@@ -14,20 +14,30 @@
             margin-top: 15px;
         }
         input, select, textarea {
-            width: 100%;
-            padding: 8px;
-            margin-top: 5px;
+    		width: 80%;       /* nicht die volle Breite, sondern 80% */
+    		max-width: 400px; /* maximale Breite, auch auf großen Bildschirmen */
+    		padding: 8px;
+    		margin-top: 5px;
+    		margin-bottom: 15px;
+    		display: block;
+   		border: 1px solid #ccc;
+    		border-radius: 6px;
+    		box-sizing: border-box;
         }
-        button {
-            margin-top: 20px;
-            padding: 10px 15px;
-            background-color: #2a9d8f;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #21867a;
+	button {
+    	margin-top: 20px;
+    	padding: 12px 20px;
+    	background-color: #1a237e; /* Dunkelblau */
+    	color: white;
+    	border: none;
+    	border-radius: 8px;
+    	cursor: pointer;
+    	font-weight: bold;
+    	transition: background-color 0.3s ease;
+	}
+
+	button:hover {
+    	background-color: #283593; /* etwas helleres Blau beim Hover */
         }
         details {
             margin-top: 5px;
@@ -35,22 +45,22 @@
     </style>
 </head>
 <body>
-    <h1>Anmeldung Kinder Ferien Club</h1>
+    <h1>Online-Anmeldung Kinder-Ferien-Club Steinen</h1>
     <form action="#" method="POST">
         <label for="Vorname">Vorname des Kindes:</label>
-        <input type="text" id="name" name="name" required>
+        <input type="text" id="name" name="name" placeholder="Max" required>
 
 	<label for="Nachname">Nachname:</label>
-        <input type="text" id="name" name="name" required>
+        <input type="text" id="name" name="name" placeholder="Mustermann" required>
 
         <label for="strasse">Straße:</label>
         <input type="text" id="strasse" name="strasse" placeholder="Musterstraße 12" required>
 
         <label for="plz">Postleitzahl:</label>
-        <input type="text" id="plz" name="plz" placeholder="12345" required>
+        <input type="text" id="plz" name="plz" placeholder="79665" required>
 
         <label for="ort">Ort:</label>
-        <input type="text" id="ort" name="ort" placeholder="Beispielstadt" required>
+        <input type="text" id="ort" name="ort" placeholder="Lörrach" required>
 
         <label for="geburtsdatum">Geburtsdatum:</label>
         <input type="date" id="geburtsdatum" name="geburtsdatum" required>
