@@ -1,73 +1,74 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Kinder Ferien Club Anmeldung</title>
-  <link rel="manifest" href="manifest.json" />
-  <style>
-    body {
-      font-family: sans-serif;
-      padding: 20px;
-      max-width: 500px;
-      margin: auto;
-    }
-    input, button {
-      width: 100%;
-      margin: 8px 0;
-      padding: 10px;
-      font-size: 1em;
-    }
-    #qrcode {
-      margin-top: 20px;
-      text-align: center;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kinder Ferien Club Anmeldung</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        label {
+            display: block;
+            margin-top: 15px;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px 15px;
+            background-color: #2a9d8f;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #21867a;
+        }
+        details {
+            margin-top: 5px;
+        }
+    </style>
 </head>
 <body>
-  <h1>Anmeldung Ferien Club</h1>
-  <form id="signupForm">
-    <label>Vorname Kind*</label>
-    <input type="text" id="childName" required />
+    <h1>Anmeldung Kinder Ferien Club</h1>
+    <form action="#" method="POST">
+        <label for="name">Name des Kindes:</label>
+        <input type="text" id="name" name="name" required>
 
-    <label>Name Eltern*</label>
-    <input type="text" id="parentName" required />
+        <label for="adresse">Adresse:</label>
+        <input type="text" id="adresse" name="adresse" required>
 
-    <label>E-Mail*</label>
-    <input type="email" id="email" required />
+        <label for="geburtsdatum">Geburtsdatum:</label>
+        <input type="date" id="geburtsdatum" name="geburtsdatum" required>
 
-    <button type="submit">Anmelden</button>
-  </form>
+        <label for="notfallnummer">Notfalltelefonnummer:</label>
+        <input type="tel" id="notfallnummer" name="notfallnummer" placeholder="z.B. 01234 567890" required>
 
-  <div id="qrcode"></div>
+        <label for="allergien">Allergien:</label>
+        <select id="allergien" name="allergien">
+            <option value="">-- Bitte wählen --</option>
+            <option value="keine">Keine</option>
+            <option value="nüsse">Nüsse</option>
+            <option value="milch">Milchprodukte</option>
+            <option value="ei">Ei</option>
+            <option value="gluten">Gluten</option>
+        </select>
+        <details>
+            <summary>Beispiele für Allergien anzeigen</summary>
+            <ul>
+                <li>Nüsse (Mandeln, Haselnüsse, Erdnüsse)</li>
+                <li>Milchprodukte (Käse, Milch, Joghurt)</li>
+                <li>Ei (in Backwaren, Pfannkuchen)</li>
+                <li>Gluten (Weizen, Roggen, Gerste)</li>
+            </ul>
+        </details>
 
-  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
-  <script>
-    const form = document.getElementById('signupForm');
-    const qrDiv = document.getElementById('qrcode');
-
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const childName = document.getElementById('childName').value;
-      const parentName = document.getElementById('parentName').value;
-      const email = document.getElementById('email').value;
-
-      const data = {
-        childName,
-        parentName,
-        email,
-        timestamp: new Date().toISOString()
-      };
-
-      // QR-Code erzeugen (lokal, kein Server nötig)
-      qrDiv.innerHTML = "";
-      QRCode.toCanvas(JSON.stringify(data), { width: 200 }, function (err, canvas) {
-        if (err) console.error(err);
-        qrDiv.appendChild(canvas);
-      });
-
-      alert("Anmeldung gespeichert (lokal)! QR-Code ist unten sichtbar.");
-    });
-  </script>
+        <button type="submit">Anmeldung abschicken</button>
+    </form>
 </body>
 </html>
