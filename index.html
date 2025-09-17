@@ -9,49 +9,91 @@
             font-family: Arial, sans-serif;
             margin: 20px;
         }
-        label {
-            display: block;
-            margin-top: 15px;
-        }
-        input, select, textarea {
-    		width: 80%;       /* nicht die volle Breite, sondern 80% */
-    		max-width: 400px; /* maximale Breite, auch auf großen Bildschirmen */
-    		padding: 8px;
-    		margin-top: 5px;
-    		margin-bottom: 15px;
-    		display: block;
-   		border: 1px solid #ccc;
-    		border-radius: 6px;
-    		box-sizing: border-box;
-        }
-	button {
-    	margin-top: 20px;
-    	padding: 12px 20px;
-    	background-color: #1a237e; /* Dunkelblau */
-    	color: white;
-    	border: none;
-    	border-radius: 8px;
-    	cursor: pointer;
-    	font-weight: bold;
-    	transition: background-color 0.3s ease;
-	}
 
-	button:hover {
-    	background-color: #283593; /* etwas helleres Blau beim Hover */
+        h1 {
+            text-align: left; /* Titel linksbündig */
         }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start; /* Alles linksbündig */
+        }
+
+        input, select, textarea {
+            width: 80%;
+            max-width: 400px;
+            padding: 8px;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            display: block;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+
+        button {
+            padding: 12px 20px;
+            background-color: #1a237e; /* Dunkelblau */
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #283593; /* Hover-Effekt */
+        }
+
         details {
             margin-top: 5px;
+            margin-bottom: 15px;
+        }
+
+        /* DSGVO-Checkboxen linksbündig */
+        .ds-gvo-container {
+            display: flex;
+            flex-direction: column; /* untereinander */
+            align-items: flex-start; /* linksbündig */
+            gap: 5px;
+            margin-bottom: 15px;
+            width: 80%;
+            max-width: 400px;
+        }
+
+        .ds-gvo-container label {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            margin: 0;
+        }
+
+        .ds-gvo-container label input[type="checkbox"] {
+            margin-right: 8px;
+        }
+
+        /* Logo linksbündig */
+        .logo {
+            display: block;
+            margin-bottom: 20px;
+            max-width: 150px;
         }
     </style>
 </head>
 <body>
+    <!-- Logo -->
+    <img src="icon-kfc.png" alt="Ferienclub Logo" class="logo">
+
     <h1>Online-Anmeldung Kinder-Ferien-Club Steinen</h1>
+
     <form action="#" method="POST">
         <label for="Vorname">Vorname des Kindes:</label>
-        <input type="text" id="name" name="name" placeholder="Max" required>
+        <input type="text" id="Vorname" name="Vorname" placeholder="Max" required>
 
-	<label for="Nachname">Nachname:</label>
-        <input type="text" id="name" name="name" placeholder="Mustermann" required>
+        <label for="Nachname">Nachname:</label>
+        <input type="text" id="Nachname" name="Nachname" placeholder="Mustermann" required>
 
         <label for="strasse">Straße:</label>
         <input type="text" id="strasse" name="strasse" placeholder="Musterstraße 12" required>
@@ -77,6 +119,7 @@
             <option value="ei">Ei</option>
             <option value="gluten">Gluten</option>
         </select>
+
         <details>
             <summary>Beispiele für Allergien anzeigen</summary>
             <ul>
@@ -86,6 +129,19 @@
                 <li>Gluten (Weizen, Roggen, Gerste)</li>
             </ul>
         </details>
+
+        <!-- DSGVO-Zustimmungen -->
+        <div class="ds-gvo-container">
+            <label>
+                <input type="checkbox" name="ds_gvo" required>
+                Ich stimme zu, dass meine Daten zum Zwecke der Anmeldung für den Ferienclub verarbeitet und bis zwei Wochen nach Ende des Ferienprogramms gespeichert werden.
+            </label>
+
+            <label>
+                <input type="checkbox" name="newsletter">
+                Ich möchte den AB_Gemeinde Newsletter abonnieren. (Optional)
+            </label>
+        </div>
 
         <button type="submit">Anmeldung abschicken</button>
     </form>
