@@ -1,2 +1,5 @@
-pip install flask qrcode pillow flask-mail gunicorn
-pip freeze > requirements.txt
+flask==2.3.3
+qrcode==7.4
+pillow==10.1.0
+flask-mail==0.9.1
+gunicorn==21.2.0
