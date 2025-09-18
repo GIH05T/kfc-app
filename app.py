@@ -108,4 +108,3 @@ def anmelden():
 if __name__ == "__main__":
     app.run(debug=True)
 
-print(f"Neues Kind gespeichert: {kind_id}, {vorname} {nachname}")
