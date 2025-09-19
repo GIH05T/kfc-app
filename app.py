@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, send_file
+from flask import Flask, request, render_template, send_file, abort
 import sqlite3
 import uuid
 import qrcode
@@ -87,6 +87,14 @@ def anmelden():
         <img src="data:image/png;base64,{qr_base64}" alt="QR-Code">
         <p><a href="/">Zurück zum Formular</a></p>
     '''
+
+# --- Sichere Route zum Herunterladen der Datenbank ---
+@app.route('/download-db')
+def download_db():
+    secret_key = request.args.get("key")
+    if secret_key != "MEINGEHEIMESPASSWORT":  # Passwort anpassen!
+        return abort(403)
+    return send_file(DB_FILE, as_attachment=True)
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
