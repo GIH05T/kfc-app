@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, send_file, abort
+from flask import Flask, request, render_template, abort
 import sqlite3
 import uuid
 import qrcode
@@ -8,7 +8,7 @@ import os
 
 app = Flask(__name__)
 
-# --- Datenbank initialisieren ---
+# --- Datenbank ---
 DB_FILE = 'kfc.db'
 
 def init_db():
@@ -33,15 +33,14 @@ def init_db():
 
 init_db()
 
-# --- Route für Formularanzeige ---
+# --- Formularanzeige ---
 @app.route('/', methods=['GET'])
 def index():
-    return render_template('form.html')  # sucht automatisch im templates/ Ordner
+    return render_template('form.html')
 
-# --- Route zum Verarbeiten des Formulars ---
+# --- Anmeldung verarbeiten ---
 @app.route('/anmelden', methods=['POST'])
 def anmelden():
-    # Daten aus Formular auslesen
     vorname = request.form.get('Vorname')
     nachname = request.form.get('Nachname')
     email = request.form.get('email')
@@ -52,10 +51,8 @@ def anmelden():
     notfallnummer = request.form.get('notfallnummer')
     allergien = request.form.get('allergien')
 
-    # Eindeutige ID generieren
     kind_id = str(uuid.uuid4())
 
-    # Daten in DB speichern
     conn = sqlite3.connect(DB_FILE)
     c = conn.cursor()
     c.execute('''
@@ -65,21 +62,17 @@ def anmelden():
     conn.commit()
     conn.close()
 
-    # QR-Code generieren (nur die ID)
+    # QR-Code generieren
     qr = qrcode.QRCode(version=1, box_size=10, border=4)
     qr.add_data(kind_id)
     qr.make(fit=True)
     img = qr.make_image(fill_color='black', back_color='white')
 
-    # QR-Code in Bytes speichern
     buf = io.BytesIO()
     img.save(buf, format='PNG')
     buf.seek(0)
-
-    # QR-Code als Base64 für HTML einbetten
     qr_base64 = base64.b64encode(buf.getvalue()).decode('ascii')
 
-    # HTML zurückgeben
     return f'''
         <h2>Vielen Dank für die Anmeldung, {vorname} {nachname}!</h2>
         <p>Ihre eindeutige Kind-ID: <strong>{kind_id}</strong></p>
@@ -88,13 +81,48 @@ def anmelden():
         <p><a href="/">Zurück zum Formular</a></p>
     '''
 
-# --- Sichere Route zum Herunterladen der Datenbank ---
-@app.route('/download-db')
-def download_db():
-    secret_key = request.args.get("key")
-    if secret_key != "MEINGEHEIMESPASSWORT":  # Passwort anpassen!
+# --- Admin-Seite mit Suchfunktion ---
+@app.route('/admin', methods=['GET'])
+def admin():
+    password = request.args.get('key')
+    if password != "MEINADMINPASSWORT":  # Passwort anpassen!
         return abort(403)
-    return send_file(DB_FILE, as_attachment=True)
+
+    search = request.args.get('search', '').strip()  # Suchfeld optional
+
+    conn = sqlite3.connect(DB_FILE)
+    c = conn.cursor()
+
+    if search:
+        # Suche nach Vorname, Nachname oder ID
+        c.execute('''
+            SELECT * FROM kinder 
+            WHERE id LIKE ? OR vorname LIKE ? OR nachname LIKE ?
+            ORDER BY vorname
+        ''', (f'%{search}%', f'%{search}%', f'%{search}%'))
+    else:
+        c.execute('SELECT * FROM kinder ORDER BY vorname')
+
+    kinder = c.fetchall()
+    conn.close()
+
+    # HTML-Tabelle
+    table_html = "<table border='1' cellpadding='5'><tr><th>ID</th><th>Vorname</th><th>Nachname</th><th>Email</th><th>Straße</th><th>PLZ</th><th>Ort</th><th>Geburtsdatum</th><th>Notfallnummer</th><th>Allergien</th></tr>"
+    for k in kinder:
+        table_html += "<tr>" + "".join(f"<td>{field}</td>" for field in k) + "</tr>"
+    table_html += "</table>"
+
+    # Suchfeld HTML
+    search_form = f'''
+        <form method="get" action="/admin">
+            <input type="hidden" name="key" value="{password}">
+            <input type="text" name="search" placeholder="Nach Name oder ID suchen" value="{search}">
+            <button type="submit">Suchen</button>
+        </form>
+        <br>
+    '''
+
+    return f"<h2>Admin-Seite: Alle Anmeldungen</h2>{search_form}{table_html}<p><a href='/'>Zurück zum Formular</a></p>"
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
