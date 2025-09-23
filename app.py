@@ -9,11 +9,11 @@ import qrcode
 app = Flask(__name__)
 
 # -------------------------------
-# --- Render-Environment ---
+# --- Environment Variables ---
 # -------------------------------
 DATABASE_URL = os.getenv("DATABASE_URL")
 ADMIN_KEY = os.getenv("ADMIN_KEY", "MEINADMINPASSWORT")
-PORT = int(os.getenv("PORT", 5000))  # Render setzt automatisch PORT
+PORT = int(os.getenv("PORT", 5000))
 
 # -------------------------------
 # --- DB Initialisierung ---

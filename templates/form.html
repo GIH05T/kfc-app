@@ -26,7 +26,6 @@
             padding: 8px;
             margin-top: 5px;
             margin-bottom: 15px;
-            display: block;
             border: 1px solid #ccc;
             border-radius: 6px;
             box-sizing: border-box;
@@ -52,6 +51,7 @@
             margin-bottom: 15px;
         }
 
+        /* DSGVO Checkboxen */
         .ds-gvo-container {
             display: flex;
             flex-direction: column;
@@ -73,6 +73,7 @@
             margin-right: 8px;
         }
 
+        /* Logo */
         .logo {
             display: block;
             margin-bottom: 20px;
@@ -82,11 +83,10 @@
 </head>
 <body>
     <!-- Logo -->
-    <img src="{{ url_for('static', filename='icon-kfc.png') }}" alt="Ferienclub Logo" class="logo">
+    <img src="icon-kfc.png" alt="Ferienclub Logo" class="logo">
 
     <h1>Online-Anmeldung Kinder-Ferien-Club Steinen</h1>
 
-    <!-- Formular -->
     <form action="/anmelden" method="POST">
         <label for="Vorname">Vorname des Kindes:</label>
         <input type="text" id="Vorname" name="Vorname" placeholder="Max" required>
@@ -94,8 +94,8 @@
         <label for="Nachname">Nachname:</label>
         <input type="text" id="Nachname" name="Nachname" placeholder="Mustermann" required>
 
-        <label for="email">E-Mail-Adresse (für Bestätigung):</label>
-        <input type="email" id="email" name="email" placeholder="max.mustermann@example.com" required>
+        <label for="email">E-Mail:</label>
+        <input type="email" id="email" name="email" placeholder="max@beispiel.de" required>
 
         <label for="strasse">Straße:</label>
         <input type="text" id="strasse" name="strasse" placeholder="Musterstraße 12" required>
@@ -132,7 +132,7 @@
             </ul>
         </details>
 
-        <!-- DSGVO-Zustimmungen -->
+        <!-- DSGVO -->
         <div class="ds-gvo-container">
             <label>
                 <input type="checkbox" name="ds_gvo" required>
