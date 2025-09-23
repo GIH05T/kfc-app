@@ -1,6 +1,8 @@
 flask
 qrcode
-pillow
-flask-mail
+Pillow
+Flask-Mail
 gunicorn
+SQLAlchemy
 psycopg2-binary
+html5-qrcode
