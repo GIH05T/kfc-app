@@ -1,20 +1,20 @@
-from flask import Flask, request, render_template, abort
-import sqlite3
+from flask import Flask, request, render_template_string
+import os
 import uuid
 import qrcode
 import io
 import base64
-import os
+from sqlalchemy import create_engine, text
 
 app = Flask(__name__)
 
-# --- Datenbank ---
-DB_FILE = 'kfc.db'
+# --- Datenbank-Verbindung (PostgreSQL) ---
+DATABASE_URL = "postgresql://dbkfc_user:DEIN_PASSWORT@HOSTNAME:5432/dbkfc"
+engine = create_engine(DATABASE_URL)
 
-def init_db():
-    conn = sqlite3.connect(DB_FILE)
-    c = conn.cursor()
-    c.execute('''
+# --- Tabelle erstellen falls nicht vorhanden ---
+with engine.begin() as conn:
+    conn.execute(text('''
         CREATE TABLE IF NOT EXISTS kinder (
             id TEXT PRIMARY KEY,
             vorname TEXT,
@@ -27,103 +27,130 @@ def init_db():
             notfallnummer TEXT,
             allergien TEXT
         )
-    ''')
-    conn.commit()
-    conn.close()
+    '''))
 
-init_db()
-
-# --- Formularanzeige ---
+# --- Route für Formularanzeige ---
 @app.route('/', methods=['GET'])
 def index():
-    return render_template('form.html')
+    with open('form.html', 'r', encoding='utf-8') as f:
+        form_html = f.read()
+    return render_template_string(form_html)
 
-# --- Anmeldung verarbeiten ---
+# --- Route zum Verarbeiten des Formulars ---
 @app.route('/anmelden', methods=['POST'])
 def anmelden():
-    vorname = request.form.get('Vorname')
-    nachname = request.form.get('Nachname')
-    email = request.form.get('email')
-    strasse = request.form.get('strasse')
-    plz = request.form.get('plz')
-    ort = request.form.get('ort')
-    geburtsdatum = request.form.get('geburtsdatum')
-    notfallnummer = request.form.get('notfallnummer')
-    allergien = request.form.get('allergien')
+    vorname = request.form['Vorname']
+    nachname = request.form['Nachname']
+    email = request.form['email']
+    strasse = request.form['strasse']
+    plz = request.form['plz']
+    ort = request.form['ort']
+    geburtsdatum = request.form['geburtsdatum']
+    notfallnummer = request.form['notfallnummer']
+    allergien = request.form['allergien']
 
     kind_id = str(uuid.uuid4())
 
-    conn = sqlite3.connect(DB_FILE)
-    c = conn.cursor()
-    c.execute('''
-        INSERT INTO kinder (id, vorname, nachname, email, strasse, plz, ort, geburtsdatum, notfallnummer, allergien)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    ''', (kind_id, vorname, nachname, email, strasse, plz, ort, geburtsdatum, notfallnummer, allergien))
-    conn.commit()
-    conn.close()
+    # Daten speichern
+    with engine.begin() as conn:
+        conn.execute(text('''
+            INSERT INTO kinder (id, vorname, nachname, email, strasse, plz, ort, geburtsdatum, notfallnummer, allergien)
+            VALUES (:id, :vorname, :nachname, :email, :strasse, :plz, :ort, :geburtsdatum, :notfallnummer, :allergien)
+        '''), {
+            "id": kind_id,
+            "vorname": vorname,
+            "nachname": nachname,
+            "email": email,
+            "strasse": strasse,
+            "plz": plz,
+            "ort": ort,
+            "geburtsdatum": geburtsdatum,
+            "notfallnummer": notfallnummer,
+            "allergien": allergien
+        })
 
-    # QR-Code generieren
+    # QR-Code erstellen
     qr = qrcode.QRCode(version=1, box_size=10, border=4)
     qr.add_data(kind_id)
     qr.make(fit=True)
-    img = qr.make_image(fill_color='black', back_color='white')
+    img = qr.make_image(fill='black', back_color='white')
 
     buf = io.BytesIO()
-    img.save(buf, format='PNG')
-    buf.seek(0)
-    qr_base64 = base64.b64encode(buf.getvalue()).decode('ascii')
+    img.save(buf, format="PNG")
+    img_b64 = base64.b64encode(buf.getvalue()).decode("utf-8")
 
     return f'''
         <h2>Vielen Dank für die Anmeldung, {vorname} {nachname}!</h2>
         <p>Ihre eindeutige Kind-ID: <strong>{kind_id}</strong></p>
         <p>QR-Code für diese Anmeldung:</p>
-        <img src="data:image/png;base64,{qr_base64}" alt="QR-Code">
+        <img src="data:image/png;base64,{img_b64}">
         <p><a href="/">Zurück zum Formular</a></p>
     '''
 
-# --- Admin-Seite mit Suchfunktion ---
-@app.route('/admin', methods=['GET'])
+# --- Admin-Seite mit Suchfunktion und QR-Scanner ---
+@app.route('/admin')
 def admin():
-    password = request.args.get('key')
-    if password != "MEINADMINPASSWORT":  # Passwort anpassen!
-        return abort(403)
+    key = request.args.get("key")
+    if key != "MEINADMINPASSWORT":
+        return "<h3>Zugriff verweigert – falscher Schlüssel!</h3>", 403
 
-    search = request.args.get('search', '').strip()  # Suchfeld optional
-
-    conn = sqlite3.connect(DB_FILE)
-    c = conn.cursor()
-
-    if search:
-        # Suche nach Vorname, Nachname oder ID
-        c.execute('''
-            SELECT * FROM kinder 
-            WHERE id LIKE ? OR vorname LIKE ? OR nachname LIKE ?
-            ORDER BY vorname
-        ''', (f'%{search}%', f'%{search}%', f'%{search}%'))
-    else:
-        c.execute('SELECT * FROM kinder ORDER BY vorname')
-
-    kinder = c.fetchall()
-    conn.close()
+    with engine.connect() as conn:
+        result = conn.execute(text("SELECT * FROM kinder")).fetchall()
 
     # HTML-Tabelle
-    table_html = "<table border='1' cellpadding='5'><tr><th>ID</th><th>Vorname</th><th>Nachname</th><th>Email</th><th>Straße</th><th>PLZ</th><th>Ort</th><th>Geburtsdatum</th><th>Notfallnummer</th><th>Allergien</th></tr>"
-    for k in kinder:
-        table_html += "<tr>" + "".join(f"<td>{field}</td>" for field in k) + "</tr>"
+    table_html = "<h2>Alle Anmeldungen</h2><table border='1' cellpadding='5'>"
+    table_html += "<tr><th>ID</th><th>Vorname</th><th>Nachname</th><th>Email</th><th>Straße</th><th>PLZ</th><th>Ort</th><th>Geburtsdatum</th><th>Notfallnummer</th><th>Allergien</th></tr>"
+    for row in result:
+        table_html += "<tr>" + "".join(f"<td>{str(cell)}</td>" for cell in row) + "</tr>"
     table_html += "</table>"
 
-    # Suchfeld HTML
-    search_form = f'''
-        <form method="get" action="/admin">
-            <input type="hidden" name="key" value="{password}">
-            <input type="text" name="search" placeholder="Nach Name oder ID suchen" value="{search}">
-            <button type="submit">Suchen</button>
-        </form>
-        <br>
+    # QR-Code Scanner und ID-Suche
+    html_search = '''
+    <h2>Kind suchen</h2>
+    <p>Scanne den QR-Code oder gib die ID manuell ein:</p>
+    <input type="text" id="kind_id" placeholder="Kind-ID eingeben">
+    <button onclick="sucheKind()">Suchen</button>
+    <div id="ergebnis"></div>
+    <h3>QR-Code Scanner:</h3>
+    <div id="reader" style="width:300px"></div>
+
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    <script>
+    function sucheKind() {
+        const id = document.getElementById("kind_id").value;
+        fetch("/api/suche/" + id)
+          .then(res => res.text())
+          .then(html => {
+              document.getElementById("ergebnis").innerHTML = html;
+          });
+    }
+
+    function onScanSuccess(decodedText, decodedResult) {
+        document.getElementById("kind_id").value = decodedText;
+        sucheKind();
+    }
+
+    let html5QrcodeScanner = new Html5QrcodeScanner(
+        "reader", { fps: 10, qrbox: 250 });
+    html5QrcodeScanner.render(onScanSuccess);
+    </script>
     '''
 
-    return f"<h2>Admin-Seite: Alle Anmeldungen</h2>{search_form}{table_html}<p><a href='/'>Zurück zum Formular</a></p>"
+    return table_html + html_search
+
+# --- API für Suche ---
+@app.route('/api/suche/<kind_id>')
+def api_suche(kind_id):
+    with engine.connect() as conn:
+        result = conn.execute(text("SELECT * FROM kinder WHERE id=:id"), {"id": kind_id}).fetchone()
+    if not result:
+        return "<p><b>Kein Kind gefunden!</b></p>"
+    headers = ["ID","Vorname","Nachname","Email","Straße","PLZ","Ort","Geburtsdatum","Notfallnummer","Allergien"]
+    html = "<h3>Gefundenes Kind:</h3><table border='1' cellpadding='5'>"
+    for h, v in zip(headers, result):
+        html += f"<tr><th>{h}</th><td>{v}</td></tr>"
+    html += "</table>"
+    return html
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port, debug=True)
+    app.run(debug=True)
