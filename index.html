@@ -10,9 +10,14 @@
             margin: 20px;
         }
 
-        h1 {
-            text-align: left;
-        }
+		h1, h2 {
+        text-align: center;
+        color: #003366; /* Dunkelblau passend zum Logo */
+        margin: 0;
+        padding: 0;
+		}
+		h1 { font-size: 2em; }
+		h2 { font-size: 1.5em; margin-bottom: 20px; }
 
         form {
             display: flex;
@@ -84,7 +89,8 @@
     <!-- Logo -->
     <img src="icon-kfc.png" alt="Ferienclub Logo" class="logo">
 
-    <h1>Online-Anmeldung Kinder-Ferien-Club Steinen</h1>
+	<h1>Kinder-Ferien-Club Steinen</h1>
+	<h2>Online-Anmeldung</h2>
 
     <!-- Formular -->
     <form action="/anmelden" method="POST">
