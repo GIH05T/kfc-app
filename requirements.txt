@@ -1,10 +1,6 @@
 Flask
-SQLAlchemy
-psycopg2-binary
 qrcode
 Pillow
 gunicorn
-<<<<<<< HEAD
 Flask-Mail
-=======
->>>>>>> parent of b99a284 (QR Code und Admin Seit hinzu)
+
