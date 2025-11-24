@@ -39,13 +39,8 @@
     }
 
     .checkbox-container {
-        display: flex;
-        align-items: center;
+        display: block; /* Haken wieder unter Text */
         margin-top: 15px;
-    }
-
-    .checkbox-container input[type="checkbox"] {
-        margin-right: 10px; /* Haken links vom Text */
     }
 
     button {
@@ -65,11 +60,11 @@
 </head>
 <body>
 
-<h1>Online-Anmeldung</h1>
-<h2>Kinder-Ferien-Club Steinen</h2>
+<h1>Kinder-Ferien-Club Steinen</h1>
+<h2>Online-Anmeldung</h2>
 
 <form action="/anmelden" method="POST">
-    <!-- hier kommen alle bisherigen Input-Felder wie Vorname, Nachname, Email, etc. -->
+    <!-- Hier kommen alle bisherigen Input-Felder wie Vorname, Nachname, Email, Straße, PLZ, Ort, Geburtsdatum, Notfallnummer, Allergien -->
 
     <div class="checkbox-container">
         <input type="checkbox" id="dsfvo" name="dsfvo" required>
