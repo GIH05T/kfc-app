@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template_string
+from flask import Flask, request, render_template
 import uuid
 import qrcode
 import io
@@ -9,14 +9,10 @@ app = Flask(__name__)
 # --- Temporäre Liste für angemeldete Kinder ---
 kinder_liste = []
 
-# --- HTML Formular ---
-with open("form.html", "r", encoding="utf-8") as f:
-    form_html = f.read()
-
 # --- Route für das Formular ---
 @app.route('/', methods=['GET'])
 def index():
-    return render_template_string(form_html)
+    return render_template("form_html")
 
 # --- Route zum Verarbeiten der Anmeldung ---
 @app.route('/anmelden', methods=['POST'])
