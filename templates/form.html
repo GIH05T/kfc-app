@@ -1,128 +1,83 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <title>Online-Anmeldung Kinder-Ferien-Club</title>
+<meta charset="UTF-8">
+<title>Online-Anmeldung KFC Steinen</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #fff;
+        margin: 20px;
+    }
+    h1, h2 {
+        text-align: center;
+        color: #003366; /* Dunkelblau passend zum Logo */
+        margin: 0;
+        padding: 0;
+    }
+    h1 { font-size: 2em; }
+    h2 { font-size: 1.5em; margin-bottom: 20px; }
 
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f8f8f8;
-            margin: 0;
-            padding: 0;
-        }
+    form {
+        max-width: 600px;
+        margin: auto;
+        display: flex;
+        flex-direction: column;
+    }
 
-        .logo {
-            display: block;
-            margin: 25px auto 10px auto;
-            width: 150px;
-        }
+    label {
+        margin-top: 10px;
+        font-weight: bold;
+    }
 
-        .container {
-            background: #fff;
-            max-width: 520px;
-            margin: 20px auto;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            text-align: left;
-        }
+    input, select {
+        margin-top: 5px;
+        padding: 8px;
+        font-size: 1em;
+        width: 100%;
+        box-sizing: border-box;
+    }
 
-        h1 {
-            text-align: center;
-            color: #c40000;
-        }
+    .checkbox-container {
+        display: flex;
+        align-items: center;
+        margin-top: 15px;
+    }
 
-        label {
-            font-weight: bold;
-            display: block;
-            margin-top: 12px;
-        }
+    .checkbox-container input[type="checkbox"] {
+        margin-right: 10px; /* Haken links vom Text */
+    }
 
-        input, select {
-            width: 100%;
-            padding: 10px;
-            margin-top: 6px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-        }
+    button {
+        margin-top: 20px;
+        background-color: #d00000; /* Rot wie Button */
+        color: #fff;
+        padding: 10px;
+        font-size: 1.1em;
+        border: none;
+        cursor: pointer;
+    }
 
-        button {
-            background: #c40000;
-            color: white;
-            border: none;
-            padding: 14px;
-            width: 100%;
-            border-radius: 8px;
-            margin-top: 20px;
-            font-size: 17px;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background: #e00000;
-        }
-
-        .checkbox {
-            margin-top: 15px;
-        }
-    </style>
+    button:hover {
+        background-color: #a00000;
+    }
+</style>
 </head>
-
 <body>
 
-    <img src="/static/icon-kfc.png" class="logo" alt="KFC Logo">
+<h1>Online-Anmeldung</h1>
+<h2>Kinder-Ferien-Club Steinen</h2>
 
-    <div class="container">
-        <h1>Online-Anmeldung Kinder-Ferien-Club Steinen</h1>
+<form action="/anmelden" method="POST">
+    <!-- hier kommen alle bisherigen Input-Felder wie Vorname, Nachname, Email, etc. -->
 
-        <form action="/anmelden" method="POST">
-
-            <label for="Vorname">Vorname des Kindes:</label>
-            <input type="text" id="Vorname" name="Vorname" placeholder="Max" required>
-
-            <label for="Nachname">Nachname:</label>
-            <input type="text" id="Nachname" name="Nachname" placeholder="Mustermann" required>
-
-            <label for="email">E-Mail:</label>
-            <input type="email" id="email" name="email" placeholder="max@beispiel.de" required>
-
-            <label for="strasse">Straße:</label>
-            <input type="text" id="strasse" name="strasse" placeholder="Musterstraße 12" required>
-
-            <label for="plz">Postleitzahl:</label>
-            <input type="text" id="plz" name="plz" placeholder="79665" required>
-
-            <label for="ort">Ort:</label>
-            <input type="text" id="ort" name="ort" placeholder="Lörrach" required>
-
-            <label for="geburtsdatum">Geburtsdatum:</label>
-            <input type="date" id="geburtsdatum" name="geburtsdatum" required>
-
-            <label for="notfallnummer">Notfalltelefonnummer:</label>
-            <input type="tel" id="notfallnummer" name="notfallnummer" placeholder="z.B. 01234 567890" required>
-
-            <label for="allergien">Allergien:</label>
-            <select id="allergien" name="allergien">
-                <option value="">-- Bitte wählen --</option>
-                <option value="keine">Keine</option>
-                <option value="nüsse">Nüsse</option>
-                <option value="laktose">Laktose</option>
-                <option value="ei">Ei</option>
-                <option value="gluten">Gluten</option>
-                <option value="sonstige">Sonstige</option>
-            </select>
-
-            <div class="checkbox">
-                <label>
-                    <input type="checkbox" name="dsgvo" required>
-                    Ich bestätige, dass meine Daten gemäß der Datenschutzerklärung verarbeitet werden.
-                </label>
-            </div>
-
-            <button type="submit">Jetzt anmelden</button>
-        </form>
+    <div class="checkbox-container">
+        <input type="checkbox" id="dsfvo" name="dsfvo" required>
+        <label for="dsfvo">Ich stimme der DSGVO zu</label>
     </div>
+
+    <button type="submit">Anmelden</button>
+</form>
 
 </body>
 </html>
