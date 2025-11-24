@@ -3,105 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kinder Ferien Club Anmeldung</title>
+    <title>Kinder-Ferien-Club Anmeldung</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
         }
-
-		h1, h2 {
-        text-align: center;
-        color: #003366; /* Dunkelblau passend zum Logo */
-        margin: 0;
-        padding: 0;
-		}
-		h1 { font-size: 2em; }
-		h2 { font-size: 1.5em; margin-bottom: 20px; }
-
-        form {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-        }
-
-        input, select, textarea {
-            width: 80%;
-            max-width: 400px;
-            padding: 8px;
-            margin-top: 5px;
-            margin-bottom: 15px;
-            display: block;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            box-sizing: border-box;
-        }
-
-        button {
-            padding: 12px 20px;
-            background-color: #1a237e;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: background-color 0.3s ease;
-        }
-
-        button:hover {
-            background-color: #283593;
-        }
-
-        details {
-            margin-top: 5px;
-            margin-bottom: 15px;
-        }
-
-        .ds-gvo-container {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 5px;
-            margin-bottom: 15px;
-            width: 80%;
-            max-width: 400px;
-        }
-
-        .ds-gvo-container label {
-            display: flex;
-            align-items: center;
-            font-size: 14px;
-            margin: 0;
-        }
-
-        .ds-gvo-container label input[type="checkbox"] {
-            margin-right: 8px;
-        }
-
         .logo {
             display: block;
-            margin-bottom: 20px;
+            margin: 0 auto 20px auto;
             max-width: 150px;
+        }
+        h1, h2 {
+            text-align: center;
+            color: #003366; /* Dunkelblau passend zum Logo */
+            margin: 0;
+            padding: 0;
+        }
+        h1 { font-size: 2em; }
+        h2 { font-size: 1.5em; margin-bottom: 20px; }
+        form {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 5px;
+            margin-top: 3px;
+        }
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 15px;
+        }
+        button {
+            margin-top: 20px;
+            background-color: red;
+            color: white;
+            border: none;
+            padding: 10px;
+            width: 100%;
+            font-size: 1em;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
+
     <!-- Logo -->
     <img src="icon-kfc.png" alt="Ferienclub Logo" class="logo">
 
-	<h1>Kinder-Ferien-Club Steinen</h1>
-	<h2>Online-Anmeldung</h2>
+    <h1>Kinder-Ferien-Club Steinen</h1>
+    <h2>Online-Anmeldung</h2>
 
-    <!-- Formular -->
-    <form action="/anmelden" method="POST">
+    <form action="/" method="POST">
         <label for="Vorname">Vorname des Kindes:</label>
         <input type="text" id="Vorname" name="Vorname" placeholder="Max" required>
 
         <label for="Nachname">Nachname:</label>
         <input type="text" id="Nachname" name="Nachname" placeholder="Mustermann" required>
 
-        <label for="email">E-Mail-Adresse (für Bestätigung):</label>
-        <input type="email" id="email" name="email" placeholder="max.mustermann@example.com" required>
+        <label for="email">E-Mail:</label>
+        <input type="email" id="email" name="email" placeholder="max@beispiel.de" required>
 
         <label for="strasse">Straße:</label>
         <input type="text" id="strasse" name="strasse" placeholder="Musterstraße 12" required>
@@ -123,35 +92,17 @@
             <option value="">-- Bitte wählen --</option>
             <option value="keine">Keine</option>
             <option value="nüsse">Nüsse</option>
-            <option value="milch">Milchprodukte</option>
             <option value="ei">Ei</option>
             <option value="gluten">Gluten</option>
         </select>
 
-        <details>
-            <summary>Beispiele für Allergien anzeigen</summary>
-            <ul>
-                <li>Nüsse (Mandeln, Haselnüsse, Erdnüsse)</li>
-                <li>Milchprodukte (Käse, Milch, Joghurt)</li>
-                <li>Ei (in Backwaren, Pfannkuchen)</li>
-                <li>Gluten (Weizen, Roggen, Gerste)</li>
-            </ul>
-        </details>
+        <label class="checkbox-label">
+            <input type="checkbox" name="dsgvo" required>
+            Ich akzeptiere die DSGVO-Bedingungen
+        </label>
 
-        <!-- DSGVO-Zustimmungen -->
-        <div class="ds-gvo-container">
-            <label>
-                <input type="checkbox" name="ds_gvo" required>
-                Ich stimme zu, dass meine Daten zum Zwecke der Anmeldung für den Ferienclub verarbeitet und bis zwei Wochen nach Ende des Ferienprogramms gespeichert werden.
-            </label>
-
-            <label>
-                <input type="checkbox" name="newsletter">
-                Ich möchte den AB_Gemeinde Newsletter abonnieren. (Optional)
-            </label>
-        </div>
-
-        <button type="submit">Anmeldung abschicken</button>
+        <button type="submit">Anmelden</button>
     </form>
+
 </body>
 </html>

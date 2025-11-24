@@ -2,48 +2,49 @@ from flask import Flask, render_template, request, redirect, url_for
 
 app = Flask(__name__)
 
-# --- In-memory "Datenbank" ---
-anmeldungen = []
+# temporäre Speicherung der Anmeldungen in einer Liste
+registrations = []
 
-# --- Routen ---
-@app.route("/")
+@app.route("/", methods=["GET", "POST"])
 def index():
-    return render_template("form.html")
+    if request.method == "POST":
+        # Daten aus dem Formular auslesen
+        data = {
+            "Vorname": request.form.get("Vorname"),
+            "Nachname": request.form.get("Nachname"),
+            "Email": request.form.get("email"),
+            "Strasse": request.form.get("strasse"),
+            "PLZ": request.form.get("plz"),
+            "Ort": request.form.get("ort"),
+            "Geburtsdatum": request.form.get("geburtsdatum"),
+            "Notfallnummer": request.form.get("notfallnummer"),
+            "Allergien": request.form.get("allergien"),
+            "DSGVO": request.form.get("dsgvo")
+        }
+        registrations.append(data)
+        return redirect(url_for("success"))
 
-@app.route("/anmelden", methods=["POST"])
-def anmelden():
-    # Prüfen, ob DSGVO angekreuzt wurde
-    if not request.form.get("dsgvo"):
-        return "Bitte DSGVO bestätigen.", 400
+    return render_template("index.html")
 
-    # Alle Felder erfassen
-    eintrag = {
-        "Vorname": request.form.get("Vorname"),
-        "Nachname": request.form.get("Nachname"),
-        "email": request.form.get("email"),
-        "strasse": request.form.get("strasse"),
-        "plz": request.form.get("plz"),
-        "ort": request.form.get("ort"),
-        "geburtsdatum": request.form.get("geburtsdatum"),
-        "notfallnummer": request.form.get("notfallnummer"),
-        "allergien": request.form.get("allergien")
-    }
 
-    # Speichern in Liste
-    anmeldungen.append(eintrag)
-
-    return redirect(url_for("danke"))
-
-@app.route("/danke")
-def danke():
-    return "<h1>Vielen Dank für die Anmeldung!</h1><a href='/'>Zurück</a>"
+@app.route("/success")
+def success():
+    return "<h2>Danke für die Anmeldung!</h2><p><a href='/'>Zurück</a></p>"
 
 @app.route("/admin")
 def admin():
-    return render_template("admin.html", anmeldungen=anmeldungen)
-
-# --- Admin Seite ---
-# admin.html sollte eine Tabelle mit allen Anmeldungen anzeigen
+    # einfache Passwort-Abfrage
+    from flask import request, abort
+    admin_password = "MEINADMINPASSWORT"
+    pw = request.args.get("pw")
+    if pw != admin_password:
+        abort(403, "Zugriff verweigert")
+    # Liste der Anmeldungen anzeigen
+    html = "<h1>Adminbereich</h1><ul>"
+    for r in registrations:
+        html += f"<li>{r}</li>"
+    html += "</ul>"
+    return html
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=10000, debug=True)
+    app.run(debug=True)
