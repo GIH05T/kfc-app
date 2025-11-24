@@ -2,58 +2,86 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kinder-Ferien-Club Anmeldung</title>
+    <title>Kinder-Ferien-Club Steinen – Anmeldung</title>
+
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 20px;
+            background: #f5f5f5;
+            padding: 20px;
+            max-width: 600px;
+            margin: auto;
         }
+
         .logo {
             display: block;
-            margin: 0 auto 20px auto;
-            max-width: 150px;
+            margin: 0 auto 10px auto;
+            width: 120px;
         }
+
         h1, h2 {
             text-align: center;
-            color: #003366; /* Dunkelblau passend zum Logo */
             margin: 0;
             padding: 0;
         }
-        h1 { font-size: 2em; }
-        h2 { font-size: 1.5em; margin-bottom: 20px; }
+
+        h1 {
+            font-size: 2em;
+            color: #1769aa; /* helleres blau */
+        }
+
+        h2 {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            color: #9ac700; /* gelb-grün */
+        }
+
         form {
-            max-width: 500px;
-            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
         }
+
         label {
-            display: block;
-            margin-top: 10px;
             font-weight: bold;
+            display: block;
+            margin-top: 12px;
         }
+
         input, select {
             width: 100%;
-            padding: 5px;
-            margin-top: 3px;
-        }
-        .checkbox-label {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            margin-top: 15px;
-        }
-        button {
-            margin-top: 20px;
-            background-color: red;
-            color: white;
-            border: none;
             padding: 10px;
+            margin-top: 3px;
+            border-radius: 5px;
+            border: 1px solid #aaa;
+        }
+
+        /* Unterschriftfeld */
+        #signature-pad {
+            border: 2px solid #888;
             width: 100%;
-            font-size: 1em;
+            height: 150px;
+            margin-top: 5px;
+            border-radius: 5px;
+        }
+
+        button {
+            background: #d50000;
+            color: white;
+            font-size: 1.2em;
+            padding: 12px;
+            border: none;
+            width: 100%;
+            border-radius: 8px;
+            margin-top: 20px;
             cursor: pointer;
+        }
+        button:hover {
+            background: #b00000;
         }
     </style>
 </head>
+
 <body>
 
     <!-- Logo -->
@@ -62,47 +90,79 @@
     <h1>Kinder-Ferien-Club Steinen</h1>
     <h2>Online-Anmeldung</h2>
 
-    <form action="/" method="POST">
-        <label for="Vorname">Vorname des Kindes:</label>
-        <input type="text" id="Vorname" name="Vorname" placeholder="Max" required>
+    <form action="/anmelden" method="POST" onsubmit="saveSignature()">
 
-        <label for="Nachname">Nachname:</label>
-        <input type="text" id="Nachname" name="Nachname" placeholder="Mustermann" required>
+        <label>Vorname:</label>
+        <input type="text" name="Vorname" required>
 
-        <label for="email">E-Mail:</label>
-        <input type="email" id="email" name="email" placeholder="max@beispiel.de" required>
+        <label>Nachname:</label>
+        <input type="text" name="Nachname" required>
 
-        <label for="strasse">Straße:</label>
-        <input type="text" id="strasse" name="strasse" placeholder="Musterstraße 12" required>
+        <label>E-Mail (optional):</label>
+        <input type="email" name="email">
 
-        <label for="plz">Postleitzahl:</label>
-        <input type="text" id="plz" name="plz" placeholder="79665" required>
+        <label>Straße:</label>
+        <input type="text" name="strasse" required>
 
-        <label for="ort">Ort:</label>
-        <input type="text" id="ort" name="ort" placeholder="Lörrach" required>
+        <label>Postleitzahl:</label>
+        <input type="text" name="plz" required>
 
-        <label for="geburtsdatum">Geburtsdatum:</label>
-        <input type="date" id="geburtsdatum" name="geburtsdatum" required>
+        <label>Ort:</label>
+        <input type="text" name="ort" required>
 
-        <label for="notfallnummer">Notfalltelefonnummer:</label>
-        <input type="tel" id="notfallnummer" name="notfallnummer" placeholder="z.B. 01234 567890" required>
+        <label>Geburtsdatum:</label>
+        <input type="date" name="geburtsdatum" required>
 
-        <label for="allergien">Allergien:</label>
-        <select id="allergien" name="allergien">
+        <label>Notfallnummer:</label>
+        <input type="tel" name="notfallnummer" required>
+
+        <label>Allergien:</label>
+        <select name="allergien" required>
             <option value="">-- Bitte wählen --</option>
             <option value="keine">Keine</option>
             <option value="nüsse">Nüsse</option>
             <option value="ei">Ei</option>
             <option value="gluten">Gluten</option>
+            <option value="laktose">Laktose</option>
         </select>
 
-        <label class="checkbox-label">
-            <input type="checkbox" name="dsgvo" required>
-            Ich akzeptiere die DSGVO-Bedingungen
-        </label>
+        <label>Unterschrift*:</label>
+        <canvas id="signature-pad"></canvas>
+        <input type="hidden" name="signature" id="signature">
 
-        <button type="submit">Anmelden</button>
+        <button type="submit">Anmeldung abschicken</button>
     </form>
+
+    <script>
+        // Unterschriftfeld
+        const canvas = document.getElementById("signature-pad");
+        const ctx = canvas.getContext("2d");
+        let drawing = false;
+
+        canvas.addEventListener("mousedown", () => drawing = true);
+        canvas.addEventListener("mouseup", () => drawing = false);
+        canvas.addEventListener("mouseleave", () => drawing = false);
+        canvas.addEventListener("mousemove", draw);
+
+        function draw(e) {
+            if (!drawing) return;
+            const rect = canvas.getBoundingClientRect();
+            ctx.lineWidth = 2;
+            ctx.lineCap = "round";
+            ctx.strokeStyle = "#000";
+
+            ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+        }
+
+        // Beim Absenden → Unterschrift speichern
+        function saveSignature() {
+            const dataURL = canvas.toDataURL();
+            document.getElementById("signature").value = dataURL;
+        }
+    </script>
 
 </body>
 </html>
