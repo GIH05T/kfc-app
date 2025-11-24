@@ -5,115 +5,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kinder Ferien Club Anmeldung</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-
-        h1 {
-            text-align: left;
-        }
-
-        form {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-        }
-
-        input, select, textarea {
-            width: 80%;
-            max-width: 400px;
-            padding: 8px;
-            margin-top: 5px;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            box-sizing: border-box;
-        }
-
-        button {
-            padding: 12px 20px;
-            background-color: #1a237e;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: background-color 0.3s ease;
-        }
-
-        button:hover {
-            background-color: #283593;
-        }
-
-        details {
-            margin-top: 5px;
-            margin-bottom: 15px;
-        }
-
-        /* DSGVO Checkboxen */
-        .ds-gvo-container {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 5px;
-            margin-bottom: 15px;
-            width: 80%;
-            max-width: 400px;
-        }
-
-        .ds-gvo-container label {
-            display: flex;
-            align-items: center;
-            font-size: 14px;
-            margin: 0;
-        }
-
-        .ds-gvo-container label input[type="checkbox"] {
-            margin-right: 8px;
-        }
-
-        /* Logo */
-        .logo {
-            display: block;
-            margin-bottom: 20px;
-            max-width: 150px;
-        }
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h1 { text-align: left; }
+        form { display: flex; flex-direction: column; align-items: flex-start; }
+        input, select { width: 80%; max-width: 400px; padding: 8px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 6px; }
+        button { padding: 12px 20px; background-color: #1a237e; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        button:hover { background-color: #283593; }
     </style>
 </head>
 <body>
-    <!-- Logo -->
-    <img src="icon-kfc.png" alt="Ferienclub Logo" class="logo">
-
     <h1>Online-Anmeldung Kinder-Ferien-Club Steinen</h1>
-
     <form action="/anmelden" method="POST">
-        <label for="Vorname">Vorname des Kindes:</label>
-        <input type="text" id="Vorname" name="Vorname" placeholder="Max" required>
-
-        <label for="Nachname">Nachname:</label>
-        <input type="text" id="Nachname" name="Nachname" placeholder="Mustermann" required>
-
-        <label for="email">E-Mail:</label>
-        <input type="email" id="email" name="email" placeholder="max@beispiel.de" required>
-
-        <label for="strasse">Straße:</label>
-        <input type="text" id="strasse" name="strasse" placeholder="Musterstraße 12" required>
-
-        <label for="plz">Postleitzahl:</label>
-        <input type="text" id="plz" name="plz" placeholder="79665" required>
-
-        <label for="ort">Ort:</label>
-        <input type="text" id="ort" name="ort" placeholder="Lörrach" required>
-
-        <label for="geburtsdatum">Geburtsdatum:</label>
-        <input type="date" id="geburtsdatum" name="geburtsdatum" required>
-
-        <label for="notfallnummer">Notfalltelefonnummer:</label>
-        <input type="tel" id="notfallnummer" name="notfallnummer" placeholder="z.B. 01234 567890" required>
-
-        <label for="allergien">Allergien:</label>
-        <select id="allergien" name="allergien">
+        <label>Vorname:</label>
+        <input type="text" name="Vorname" required>
+        <label>Nachname:</label>
+        <input type="text" name="Nachname" required>
+        <label>E-Mail:</label>
+        <input type="email" name="email">
+        <label>Straße:</label>
+        <input type="text" name="strasse" required>
+        <label>Postleitzahl:</label>
+        <input type="text" name="plz" required>
+        <label>Ort:</label>
+        <input type="text" name="ort" required>
+        <label>Geburtsdatum:</label>
+        <input type="date" name="geburtsdatum" required>
+        <label>Notfallnummer:</label>
+        <input type="tel" name="notfallnummer" required>
+        <label>Allergien:</label>
+        <select name="allergien">
             <option value="">-- Bitte wählen --</option>
             <option value="keine">Keine</option>
             <option value="nüsse">Nüsse</option>
@@ -121,31 +41,7 @@
             <option value="ei">Ei</option>
             <option value="gluten">Gluten</option>
         </select>
-
-        <details>
-            <summary>Beispiele für Allergien anzeigen</summary>
-            <ul>
-                <li>Nüsse (Mandeln, Haselnüsse, Erdnüsse)</li>
-                <li>Milchprodukte (Käse, Milch, Joghurt)</li>
-                <li>Ei (in Backwaren, Pfannkuchen)</li>
-                <li>Gluten (Weizen, Roggen, Gerste)</li>
-            </ul>
-        </details>
-
-        <!-- DSGVO -->
-        <div class="ds-gvo-container">
-            <label>
-                <input type="checkbox" name="ds_gvo" required>
-                Ich stimme zu, dass meine Daten zum Zwecke der Anmeldung für den Ferienclub verarbeitet und bis zwei Wochen nach Ende des Ferienprogramms gespeichert werden.
-            </label>
-
-            <label>
-                <input type="checkbox" name="newsletter">
-                Ich möchte den AB_Gemeinde Newsletter abonnieren. (Optional)
-            </label>
-        </div>
-
-        <button type="submit">Anmeldung abschicken</button>
+        <button type="submit">Anmelden</button>
     </form>
 </body>
 </html>
