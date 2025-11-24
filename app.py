@@ -12,7 +12,7 @@ kinder_liste = []
 # --- Route für das Formular ---
 @app.route('/', methods=['GET'])
 def index():
-    return render_template("form_html")
+    return render_template("form.html")
 
 # --- Route zum Verarbeiten der Anmeldung ---
 @app.route('/anmelden', methods=['POST'])
