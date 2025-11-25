@@ -50,6 +50,9 @@
 
         <label>Unterschrift<span class="required">*</span></label>
         <canvas id="signature-pad"></canvas>
+        <!-- Signatur löschen Button direkt unter Canvas -->
+        <button type="button" id="reset-btn" class="reset-btn">Signatur löschen</button>
+
         <div class="checkbox-container">
             <input type="checkbox" id="dsgvo" name="dsgvo" required>
             <label for="dsgvo">Ich stimme der Datenschutzerklärung (DSGVO) zu.</label>
@@ -57,7 +60,6 @@
 
         <input type="hidden" id="signature" name="unterschrift">
         <button type="submit" id="submit-btn" disabled>Jetzt anmelden</button>
-        <button type="button" id="reset-btn" class="reset-btn">Signatur löschen</button>
     </form>
 </div>
 
