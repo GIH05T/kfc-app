@@ -1,131 +1,105 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kinder-Ferien-Club Steinen – Online-Anmeldung</title>
-
-    <style>
-        body { font-family: Arial, sans-serif; background-color: #f2f2f2; margin: 0; padding: 20px; }
-        .container { max-width: 600px; margin: auto; background: white; padding: 25px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-        .logo { display: block; margin: 0 auto 15px; width: 140px; }
-        h1,h2 { text-align: center; margin:0; padding:0; }
-        h1 { font-size: 2em; color: #0060b8; }
-        h2 { font-size: 1.6em; margin-bottom: 20px; color: #7ccc00; font-weight:bold; }
-        label { display:block; margin-top:15px; font-weight:bold; }
-        input, select { width:100%; padding:10px; margin-top:5px; border-radius:5px; border:1px solid #ccc; font-size:1em; }
-        canvas { border:1px solid #ccc; border-radius:5px; width:100%; height:150px; display:block; margin:0 auto; touch-action:none; }
-        .checkbox-container { display:flex; align-items:center; margin-top:20px; }
-        .checkbox-container input { width:auto; margin-right:10px; }
-        .reset-btn { margin-top:10px; width:100%; padding:10px; background-color:#777; color:white; border:none; border-radius:5px; cursor:pointer; }
-        .reset-btn:hover { background-color:#555; }
-        button { width:100%; margin-top:25px; padding:12px; background-color:#cc0000; color:white; font-size:1.2em; border:none; border-radius:5px; cursor:pointer; }
-        button:hover { background-color:#aa0000; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kinder-Ferien-Club Steinen – Online-Anmeldung</title>
+<style>
+body { font-family: Arial; background:#f2f2f2; margin:0; padding:20px; }
+.container { max-width:600px; margin:auto; background:#fff; padding:25px; border-radius:10px; box-shadow:0 0 10px rgba(0,0,0,0.1);}
+.logo { display:block; margin:0 auto 15px; width:140px; }
+h1,h2 { text-align:center; margin:0; padding:0; }
+h1 { font-size:2em; color:#0060b8;}
+h2 { font-size:1.6em; margin-bottom:20px; color:#7ccc00; font-weight:bold;}
+label { display:block; margin-top:15px; font-weight:bold;}
+input,select { width:100%; padding:10px; margin-top:5px; border-radius:5px; border:1px solid #ccc; font-size:1em;}
+canvas { border:1px solid #ccc; border-radius:5px; width:100%; height:150px; display:block; margin:0 auto; touch-action:none;}
+.checkbox-container { display:flex; align-items:center; margin-top:20px;}
+.checkbox-container input { width:auto; margin-right:10px; }
+.reset-btn { margin-top:10px; width:100%; padding:10px; background:#777; color:white; border:none; border-radius:5px; cursor:pointer;}
+.reset-btn:hover { background:#555; }
+button { width:100%; margin-top:25px; padding:12px; background:#cc0000; color:white; font-size:1.2em; border:none; border-radius:5px; cursor:pointer;}
+button:hover { background:#aa0000; }
+</style>
 </head>
 <body>
 
 <div class="container">
+<img src="/static/icon-kfc.png" class="logo" alt="Ferienclub Logo">
+<h1>Kinder-Ferien-Club Steinen</h1>
+<h2>Online-Anmeldung</h2>
 
-    <img src="/static/icon-kfc.png" class="logo" alt="Ferienclub Logo">
+<form action="/" method="POST" onsubmit="saveSignature()">
+<label for="Vorname">Vorname des Kindes:</label>
+<input type="text" id="Vorname" name="Vorname" placeholder="Max" required>
 
-    <h1>Kinder-Ferien-Club Steinen</h1>
-    <h2>Online-Anmeldung</h2>
+<label for="Nachname">Nachname:</label>
+<input type="text" id="Nachname" name="Nachname" placeholder="Mustermann" required>
 
-    <form action="/" method="POST" onsubmit="saveSignature()">
+<label for="email">E-Mail:</label>
+<input type="email" id="email" name="email" placeholder="max@beispiel.de">
 
-        <label for="Vorname">Vorname des Kindes:</label>
-        <input type="text" id="Vorname" name="Vorname" placeholder="Max" required>
+<label for="strasse">Straße:</label>
+<input type="text" id="strasse" name="strasse" placeholder="Musterstraße 12" required>
 
-        <label for="Nachname">Nachname:</label>
-        <input type="text" id="Nachname" name="Nachname" placeholder="Mustermann" required>
+<label for="plz">Postleitzahl:</label>
+<input type="text" id="plz" name="plz" placeholder="79665" required>
 
-        <label for="email">E-Mail:</label>
-        <input type="email" id="email" name="email" placeholder="max@beispiel.de">
+<label for="ort">Ort:</label>
+<input type="text" id="ort" name="ort" placeholder="Steinen" required>
 
-        <label for="strasse">Straße:</label>
-        <input type="text" id="strasse" name="strasse" placeholder="Musterstraße 12" required>
+<label for="geburtsdatum">Geburtsdatum:</label>
+<input type="date" id="geburtsdatum" name="geburtsdatum" required>
 
-        <label for="plz">Postleitzahl:</label>
-        <input type="text" id="plz" name="plz" placeholder="79665" required>
+<label for="notfallnummer">Notfalltelefonnummer:</label>
+<input type="tel" id="notfallnummer" name="notfallnummer" placeholder="z.B. 01234 567890" required>
 
-        <label for="ort">Ort:</label>
-        <input type="text" id="ort" name="ort" placeholder="Steinen" required>
+<label for="allergien">Allergien:</label>
+<select id="allergien" name="allergien" required>
+<option value="">-- Bitte wählen --</option>
+<option value="keine">Keine</option>
+<option value="nüsse">Nüsse</option>
+<option value="laktose">Laktose</option>
+<option value="ei">Ei</option>
+<option value="gluten">Gluten</option>
+</select>
 
-        <label for="geburtsdatum">Geburtsdatum:</label>
-        <input type="date" id="geburtsdatum" name="geburtsdatum" required>
+<label for="signature-pad">Unterschrift (Pflichtfeld):</label>
+<canvas id="signature-pad"></canvas>
+<button type="button" class="reset-btn" onclick="resetSignature()">Signatur löschen</button>
+<input type="hidden" id="signature" name="unterschrift" required>
 
-        <label for="notfallnummer">Notfalltelefonnummer:</label>
-        <input type="tel" id="notfallnummer" name="notfallnummer" placeholder="z.B. 01234 567890" required>
+<div class="checkbox-container">
+<input type="checkbox" id="dsgvo" name="dsgvo" required>
+<label for="dsgvo">Ich stimme der Datenschutzerklärung (DSGVO) zu.</label>
+</div>
 
-        <label for="allergien">Allergien:</label>
-        <select id="allergien" name="allergien" required>
-            <option value="">-- Bitte wählen --</option>
-            <option value="keine">Keine</option>
-            <option value="nüsse">Nüsse</option>
-            <option value="laktose">Laktose</option>
-            <option value="ei">Ei</option>
-            <option value="gluten">Gluten</option>
-        </select>
-
-        <label for="signature-pad">Unterschrift (Pflichtfeld):</label>
-        <canvas id="signature-pad"></canvas>
-
-        <button type="button" class="reset-btn" onclick="resetSignature()">Signatur löschen</button>
-
-        <input type="hidden" id="signature" name="unterschrift" required>
-
-        <div class="checkbox-container">
-            <input type="checkbox" id="dsgvo" name="dsgvo" required>
-            <label for="dsgvo">Ich stimme der Datenschutzerklärung (DSGVO) zu.</label>
-        </div>
-
-        <button type="submit">Jetzt anmelden</button>
-
-    </form>
-
+<button type="submit">Jetzt anmelden</button>
+</form>
 </div>
 
 <script>
 const canvas = document.getElementById("signature-pad");
 const ctx = canvas.getContext("2d");
-
 function resizeCanvas() {
     const ratio = window.devicePixelRatio || 1;
     canvas.width = canvas.offsetWidth * ratio;
     canvas.height = canvas.offsetHeight * ratio;
     ctx.scale(ratio, ratio);
 }
-resizeCanvas();
-window.addEventListener("resize", resizeCanvas);
-
-let drawing = false;
-canvas.addEventListener("mousedown", () => drawing = true);
-canvas.addEventListener("mouseup", () => { drawing = false; ctx.beginPath(); });
-canvas.addEventListener("mouseleave", () => { drawing = false; ctx.beginPath(); });
-canvas.addEventListener("mousemove", draw);
-
-function draw(e) {
-    if (!drawing) return;
-    const rect = canvas.getBoundingClientRect();
-    ctx.lineWidth = 2;
-    ctx.lineCap = "round";
-    ctx.strokeStyle = "#000";
-    ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
-}
-
-function resetSignature() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.beginPath();
-}
-
-function saveSignature() {
-    const dataURL = canvas.toDataURL();
-    document.getElementById("signature").value = dataURL;
-}
+resizeCanvas(); window.addEventListener("resize", resizeCanvas);
+let drawing=false;
+canvas.addEventListener("mousedown",()=>drawing=true);
+canvas.addEventListener("mouseup",()=>{drawing=false; ctx.beginPath();});
+canvas.addEventListener("mouseleave",()=>{drawing=false; ctx.beginPath();});
+canvas.addEventListener("mousemove",draw);
+function draw(e){ if(!drawing) return;
+const rect=canvas.getBoundingClientRect();
+ctx.lineWidth=2; ctx.lineCap="round"; ctx.strokeStyle="#000";
+ctx.lineTo(e.clientX-rect.left,e.clientY-rect.top); ctx.stroke();
+ctx.beginPath(); ctx.moveTo(e.clientX-rect.left,e.clientY-rect.top);}
+function resetSignature(){ ctx.clearRect(0,0,canvas.width,canvas.height); ctx.beginPath();}
+function saveSignature(){ const dataURL=canvas.toDataURL(); document.getElementById("signature").value=dataURL;}
 </script>
 
 </body>

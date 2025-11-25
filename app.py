@@ -1,16 +1,16 @@
 from flask import Flask, render_template, request, redirect, url_for, send_file, abort
 import json, os, qrcode
-from io import BytesIO
 import pandas as pd
 
 app = Flask(__name__)
 
 DATA_FILE = "registrations.json"
 QR_FOLDER = "static/qrcodes"
-
-# Ordner für QR-Codes erstellen, falls nicht vorhanden
 os.makedirs(QR_FOLDER, exist_ok=True)
 
+ADMIN_PASSWORD = "MEINADMINPASSWORT"
+
+# --- JSON Laden/Speichern ---
 def load_data():
     if not os.path.exists(DATA_FILE):
         return []
@@ -29,11 +29,7 @@ def generate_id():
         return max(r["ID"] for r in registrations) + 1
 
 def generate_qr_code(reg_id):
-    qr = qrcode.QRCode(
-        version=1,
-        box_size=10,
-        border=4
-    )
+    qr = qrcode.QRCode(version=1, box_size=10, border=4)
     qr.add_data(f"ID:{reg_id}")
     qr.make(fit=True)
     img = qr.make_image(fill_color="black", back_color="white")
@@ -41,13 +37,12 @@ def generate_qr_code(reg_id):
     img.save(qr_path)
     return qr_path
 
+# --- Routes ---
 @app.route("/", methods=["GET", "POST"])
 def index():
     if request.method == "POST":
         registrations = load_data()
-
         reg_id = generate_id()
-
         data = {
             "ID": reg_id,
             "Vorname": request.form.get("Vorname"),
@@ -63,14 +58,10 @@ def index():
             "DSGVO": bool(request.form.get("dsgvo")),
             "QR_Code": f"{reg_id}.png"
         }
-
         registrations.append(data)
         save_data(registrations)
-
         generate_qr_code(reg_id)
-
         return redirect(url_for("success", reg_id=reg_id))
-
     return render_template("index.html")
 
 @app.route("/success")
@@ -86,30 +77,22 @@ def success():
 @app.route("/admin")
 def admin():
     pw = request.args.get("pw")
-    if pw != "MEINADMINPASSWORT":
+    if pw != ADMIN_PASSWORD:
         return "Zugriff verweigert", 403
-
     registrations = load_data()
     return render_template("admin.html", registrations=registrations)
 
 @app.route("/export_excel")
 def export_excel():
     pw = request.args.get("pw")
-    if pw != "MEINADMINPASSWORT":
+    if pw != ADMIN_PASSWORD:
         return "Zugriff verweigert", 403
-
     registrations = load_data()
     if not registrations:
         return "Keine Daten zum Exportieren", 400
-
     df = pd.DataFrame(registrations)
     df['Unterschrift'] = df['Unterschrift'].apply(lambda x: '[Bild]')
     df['QR_Code'] = df['QR_Code'].apply(lambda x: '[QR-Bild]')
-
     output = "registrations.xlsx"
     df.to_excel(output, index=False)
-
     return send_file(output, as_attachment=True)
-
-if __name__ == "__main__":
-    app.run(debug=True)
