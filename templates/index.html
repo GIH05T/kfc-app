@@ -5,24 +5,22 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Kinder-Ferien-Club Steinen – Online-Anmeldung</title>
 <style>
-body { font-family: Arial, sans-serif; background:#f2f2f2; margin:0; padding:20px; }
+body { font-family: Arial; background:#f2f2f2; margin:0; padding:20px; }
 .container { max-width:600px; margin:auto; background:#fff; padding:25px; border-radius:10px; box-shadow:0 0 10px rgba(0,0,0,0.1);}
 .logo { display:block; margin:0 auto 15px; width:140px; }
 h1,h2 { text-align:center; margin:0; padding:0; }
 h1 { font-size:2em; color:#0060b8;}
 h2 { font-size:1.6em; margin-bottom:20px; color:#7ccc00; font-weight:bold;}
 label { display:block; margin-top:15px; font-weight:bold;}
-label .required { color:red; }
+label.required::after { content:"*"; color:red; margin-left:2px; }
 input,select { width:100%; padding:10px; margin-top:5px; border-radius:5px; border:1px solid #ccc; font-size:1em;}
 canvas { border:1px solid #ccc; border-radius:5px; width:100%; height:150px; display:block; margin:0 auto; touch-action:none;}
 .checkbox-container { display:flex; align-items:center; margin-top:20px;}
 .checkbox-container input { width:auto; margin-right:10px; }
-.button-group { display:flex; gap:10px; margin-top:10px;}
-.button-group button { flex:1; padding:10px; background:#777; color:white; border:none; border-radius:5px; cursor:pointer;}
-.button-group button:hover { background:#555; }
-button.submit-btn { width:100%; margin-top:25px; padding:12px; background:#cc0000; color:white; font-size:1.2em; border:none; border-radius:5px; cursor:pointer;}
-button.submit-btn:disabled { background:#aaa; cursor:not-allowed;}
-button.submit-btn:hover:not(:disabled) { background:#aa0000; }
+button { width:100%; margin-top:25px; padding:12px; font-size:1.2em; border:none; border-radius:5px; cursor:not-allowed; color:white; background:#aaa;}
+button.active { background:#cc0000; cursor:pointer;}
+.reset-btn { width:100%; padding:10px; margin-top:10px; background:#777; color:white; border:none; border-radius:5px; cursor:pointer;}
+.reset-btn:hover { background:#555;}
 </style>
 </head>
 <body>
@@ -32,32 +30,32 @@ button.submit-btn:hover:not(:disabled) { background:#aa0000; }
 <h1>Kinder-Ferien-Club Steinen</h1>
 <h2>Online-Anmeldung</h2>
 
-<form action="/" method="POST" onsubmit="saveSignature(); return true;" id="anmeldeForm">
-<label for="Vorname">Vorname <span class="required">*</span></label>
+<form id="registrationForm" action="/" method="POST">
+<label for="Vorname" class="required">Vorname</label>
 <input type="text" id="Vorname" name="Vorname" placeholder="Max" required>
 
-<label for="Nachname">Nachname <span class="required">*</span></label>
+<label for="Nachname" class="required">Nachname</label>
 <input type="text" id="Nachname" name="Nachname" placeholder="Mustermann" required>
 
 <label for="email">E-Mail</label>
 <input type="email" id="email" name="email" placeholder="max@beispiel.de">
 
-<label for="strasse">Straße <span class="required">*</span></label>
+<label for="strasse" class="required">Straße</label>
 <input type="text" id="strasse" name="strasse" placeholder="Musterstraße 12" required>
 
-<label for="plz">Postleitzahl <span class="required">*</span></label>
+<label for="plz" class="required">Postleitzahl</label>
 <input type="text" id="plz" name="plz" placeholder="79665" required>
 
-<label for="ort">Ort <span class="required">*</span></label>
+<label for="ort" class="required">Ort</label>
 <input type="text" id="ort" name="ort" placeholder="Steinen" required>
 
-<label for="geburtsdatum">Geburtsdatum <span class="required">*</span></label>
+<label for="geburtsdatum" class="required">Geburtsdatum</label>
 <input type="date" id="geburtsdatum" name="geburtsdatum" required>
 
-<label for="notfallnummer">Notfalltelefonnummer <span class="required">*</span></label>
+<label for="notfallnummer" class="required">Notfalltelefonnummer</label>
 <input type="tel" id="notfallnummer" name="notfallnummer" placeholder="z.B. 01234 567890" required>
 
-<label for="allergien">Allergien <span class="required">*</span></label>
+<label for="allergien" class="required">Allergien</label>
 <select id="allergien" name="allergien" required>
 <option value="">-- Bitte wählen --</option>
 <option value="keine">Keine</option>
@@ -67,20 +65,17 @@ button.submit-btn:hover:not(:disabled) { background:#aa0000; }
 <option value="gluten">Gluten</option>
 </select>
 
-<label for="signature-pad">Unterschrift <span class="required">*</span></label>
+<label for="signature-pad" class="required">Unterschrift</label>
 <canvas id="signature-pad"></canvas>
-<div class="button-group">
-<button type="button" onclick="saveTempSignature()">Signatur speichern</button>
-<button type="button" onclick="resetSignature()">Signatur löschen</button>
-</div>
+<button type="button" class="reset-btn" onclick="resetSignature()">Signatur löschen</button>
 <input type="hidden" id="signature" name="unterschrift">
 
 <div class="checkbox-container">
 <input type="checkbox" id="dsgvo" name="dsgvo" required>
-<label for="dsgvo">Ich stimme der Datenschutzerklärung (DSGVO) zu. <span class="required">*</span></label>
+<label for="dsgvo">Ich stimme der Datenschutzerklärung (DSGVO) zu.</label>
 </div>
 
-<button type="submit" class="submit-btn" id="submitBtn" disabled>Jetzt anmelden</button>
+<button type="submit" id="submitBtn">Jetzt anmelden</button>
 </form>
 </div>
 
@@ -88,8 +83,9 @@ button.submit-btn:hover:not(:disabled) { background:#aa0000; }
 const canvas = document.getElementById("signature-pad");
 const ctx = canvas.getContext("2d");
 let drawing = false;
-let tempDataURL = null;
+let hasSignature = false;
 
+// Canvas hochauflösend
 function resizeCanvas() {
     const ratio = window.devicePixelRatio || 1;
     canvas.width = canvas.offsetWidth * ratio;
@@ -99,20 +95,16 @@ function resizeCanvas() {
 resizeCanvas();
 window.addEventListener("resize", resizeCanvas);
 
-// Zeichnen für Desktop
-canvas.addEventListener("mousedown",()=>{drawing=true});
-canvas.addEventListener("mouseup",()=>{drawing=false; ctx.beginPath();});
-canvas.addEventListener("mouseleave",()=>{drawing=false; ctx.beginPath();});
-canvas.addEventListener("mousemove", draw);
+// Pointer Events für Touch & Maus
+canvas.addEventListener("pointerdown", e => { drawing=true; hasSignature=true; draw(e); checkForm(); });
+canvas.addEventListener("pointermove", draw);
+canvas.addEventListener("pointerup", () => { drawing=false; ctx.beginPath(); });
+canvas.addEventListener("pointerleave", () => { drawing=false; ctx.beginPath(); });
 
-// Zeichnen für Touch
-canvas.addEventListener("touchstart",(e)=>{drawing=true; e.preventDefault();});
-canvas.addEventListener("touchend",(e)=>{drawing=false; ctx.beginPath();});
-canvas.addEventListener("touchmove",(e)=>{draw(e.touches[0]); e.preventDefault();});
-
+// Zeichnen
 function draw(e){
     if(!drawing) return;
-    const rect=canvas.getBoundingClientRect();
+    const rect = canvas.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
     ctx.lineWidth = 2;
@@ -124,47 +116,43 @@ function draw(e){
     ctx.moveTo(x,y);
 }
 
+// Signatur zurücksetzen
 function resetSignature(){
     ctx.clearRect(0,0,canvas.width,canvas.height);
     ctx.beginPath();
-    tempDataURL = null;
+    hasSignature = false;
+    checkForm();
 }
 
-function saveTempSignature(){
-    tempDataURL = canvas.toDataURL();
-    alert("Signatur gespeichert! Sie bleibt beim Scrollen erhalten.");
-}
+// Form validierung
+const form = document.getElementById("registrationForm");
+const submitBtn = document.getElementById("submitBtn");
 
-function saveSignature(){
-    if(tempDataURL){
-        document.getElementById("signature").value = tempDataURL;
+function checkForm() {
+    const allValid = form.checkValidity() && hasSignature;
+    if(allValid){
+        submitBtn.classList.add("active");
+        submitBtn.disabled = false;
     } else {
-        document.getElementById("signature").value = canvas.toDataURL();
+        submitBtn.classList.remove("active");
+        submitBtn.disabled = true;
     }
 }
 
-// --- Submit Button aktivieren nur wenn Pflichtfelder ausgefüllt ---
-const requiredFields = ["Vorname","Nachname","strasse","plz","ort","geburtsdatum","notfallnummer","allergien","dsgvo"];
-const submitBtn = document.getElementById("submitBtn");
-
-function checkForm(){
-    let valid = true;
-    requiredFields.forEach(id=>{
-        const el = document.getElementById(id);
-        if(!el) return;
-        if(el.type==="checkbox") valid = valid && el.checked;
-        else valid = valid && el.value.trim() !== "";
-    });
-    submitBtn.disabled = !valid;
-}
-
-requiredFields.forEach(id=>{
-    const el = document.getElementById(id);
-    if(el) el.addEventListener("input", checkForm);
-    if(el && el.type==="checkbox") el.addEventListener("change", checkForm);
+// Save signature beim Absenden
+form.addEventListener("submit", e => {
+    if(!hasSignature) {
+        alert("Bitte unterschreiben Sie im Feld!");
+        e.preventDefault();
+        return false;
+    }
+    const dataURL = canvas.toDataURL();
+    document.getElementById("signature").value = dataURL;
 });
 
-checkForm();
+// Prüfen bei jedem Input
+form.addEventListener("input", checkForm);
+checkForm(); // initial
 </script>
 
 </body>
