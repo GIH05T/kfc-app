@@ -1,83 +1,68 @@
-document.addEventListener("DOMContentLoaded", () => {
-    const canvas = document.getElementById("signature-pad");
-    const ctx = canvas.getContext("2d");
-    const submitBtn = document.getElementById("submit-btn");
-    const clearBtn = document.getElementById("clear-signature");
-    const form = document.getElementById("registration-form");
+const canvas = document.getElementById("signature-pad");
+const ctx = canvas.getContext("2d");
+const form = document.getElementById("registration-form");
+const submitBtn = document.getElementById("submit-btn");
+const resetBtn = document.getElementById("reset-btn");
+const signatureInput = document.getElementById("signature");
 
-    // Canvas Größe setzen
-    function resizeCanvas() {
-        const ratio = window.devicePixelRatio || 1;
-        canvas.width = canvas.offsetWidth * ratio;
-        canvas.height = canvas.offsetHeight * ratio;
-        ctx.scale(ratio, ratio);
-    }
-    resizeCanvas();
-    window.addEventListener("resize", resizeCanvas);
+let drawing = false;
 
-    let drawing = false;
+function resizeCanvas() {
+    const ratio = window.devicePixelRatio || 1;
+    canvas.width = canvas.offsetWidth * ratio;
+    canvas.height = canvas.offsetHeight * ratio;
+    ctx.scale(ratio, ratio);
+}
+resizeCanvas();
+window.addEventListener("resize", resizeCanvas);
 
-    // Zeichenfunktionen
-    function startDraw() { drawing = true; }
-    function endDraw() { drawing = false; ctx.beginPath(); }
-    function draw(e) {
-        if (!drawing) return;
-        const rect = canvas.getBoundingClientRect();
-        ctx.lineWidth = 2;
-        ctx.lineCap = "round";
-        ctx.strokeStyle = "#000";
-        const x = e.clientX || e.touches[0].clientX;
-        const y = e.clientY || e.touches[0].clientY;
-        ctx.lineTo(x - rect.left, y - rect.top);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(x - rect.left, y - rect.top);
-    }
+canvas.addEventListener("mousedown", () => drawing = true);
+canvas.addEventListener("mouseup", () => { drawing = false; ctx.beginPath(); });
+canvas.addEventListener("mouseleave", () => { drawing = false; ctx.beginPath(); });
+canvas.addEventListener("mousemove", draw);
 
-    canvas.addEventListener("mousedown", startDraw);
-    canvas.addEventListener("mouseup", endDraw);
-    canvas.addEventListener("mouseleave", endDraw);
-    canvas.addEventListener("mousemove", draw);
+// Touch support
+canvas.addEventListener("touchstart", (e) => { drawing = true; draw(e.touches[0]); e.preventDefault(); });
+canvas.addEventListener("touchend", () => { drawing = false; ctx.beginPath(); });
+canvas.addEventListener("touchmove", (e) => { draw(e.touches[0]); e.preventDefault(); });
 
-    canvas.addEventListener("touchstart", (e) => { startDraw(); draw(e.touches[0]); e.preventDefault(); });
-    canvas.addEventListener("touchend", endDraw);
-    canvas.addEventListener("touchmove", (e) => { draw(e.touches[0]); e.preventDefault(); });
+function draw(e){
+    if(!drawing) return;
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    ctx.lineWidth = 2;
+    ctx.lineCap = "round";
+    ctx.strokeStyle = "#000";
+    ctx.lineTo(x,y);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(x,y);
+}
 
-    // Signatur löschen
-    clearBtn.addEventListener("click", () => {
-        ctx.clearRect(0,0,canvas.width,canvas.height);
-        ctx.beginPath();
-        checkForm();
-    });
+resetBtn.addEventListener("click", () => {
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    ctx.beginPath();
+    checkForm();
+});
 
-    // Speichern in Hidden Feld beim Absenden
-    form.addEventListener("submit", () => {
-        document.getElementById("signature").value = canvas.toDataURL();
-    });
+function isCanvasBlank(c) {
+    const blank = document.createElement("canvas");
+    blank.width = c.width;
+    blank.height = c.height;
+    return c.toDataURL() === blank.toDataURL();
+}
 
-    // Aktivieren des Submit Buttons nur wenn alle Pflichtfelder + Signatur ausgefüllt
-    function checkForm() {
-        const requiredFields = form.querySelectorAll("input[required], select[required]");
-        let valid = true;
-        requiredFields.forEach(f => {
-            if (!f.value) valid = false;
-        });
-        // Prüfen, ob Canvas signiert wurde
-        const blank = canvas.toDataURL() === canvasBlank();
-        if (blank) valid = false;
-        submitBtn.disabled = !valid;
-    }
+function checkForm() {
+    const allFilled = Array.from(form.querySelectorAll("[required]")).every(input => input.value.trim() !== "");
+    const canvasNotEmpty = !isCanvasBlank(canvas);
+    submitBtn.disabled = !(allFilled && canvasNotEmpty);
+}
 
-    function canvasBlank() {
-        const blank = document.createElement('canvas');
-        blank.width = canvas.width;
-        blank.height = canvas.height;
-        return blank.toDataURL();
-    }
+form.querySelectorAll("input, select").forEach(el => el.addEventListener("input", checkForm));
+canvas.addEventListener("mouseup", checkForm);
+canvas.addEventListener("touchend", checkForm);
 
-    // Eventlistener für Pflichtfelder
-    const requiredFields = form.querySelectorAll("input[required], select[required]");
-    requiredFields.forEach(f => f.addEventListener("input", checkForm));
-    canvas.addEventListener("mouseup", checkForm);
-    canvas.addEventListener("touchend", checkForm);
+form.addEventListener("submit", () => {
+    signatureInput.value = canvas.toDataURL();
 });

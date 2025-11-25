@@ -13,32 +13,32 @@
     <h1>Kinder-Ferien-Club Steinen</h1>
     <h2>Online-Anmeldung</h2>
 
-    <form action="/" method="POST" id="registration-form">
-        <label for="Vorname">Vorname*</label>
+    <form id="registration-form" action="/" method="POST">
+        <label for="Vorname">Vorname<span class="required">*</span></label>
         <input type="text" id="Vorname" name="Vorname" placeholder="Max" required>
 
-        <label for="Nachname">Nachname*</label>
+        <label for="Nachname">Nachname<span class="required">*</span></label>
         <input type="text" id="Nachname" name="Nachname" placeholder="Mustermann" required>
 
         <label for="email">E-Mail</label>
         <input type="email" id="email" name="email" placeholder="max@beispiel.de">
 
-        <label for="strasse">Straße*</label>
+        <label for="strasse">Straße<span class="required">*</span></label>
         <input type="text" id="strasse" name="strasse" placeholder="Musterstraße 12" required>
 
-        <label for="plz">Postleitzahl*</label>
+        <label for="plz">Postleitzahl<span class="required">*</span></label>
         <input type="text" id="plz" name="plz" placeholder="79665" required>
 
-        <label for="ort">Ort*</label>
+        <label for="ort">Ort<span class="required">*</span></label>
         <input type="text" id="ort" name="ort" placeholder="Steinen" required>
 
-        <label for="geburtsdatum">Geburtsdatum*</label>
+        <label for="geburtsdatum">Geburtsdatum<span class="required">*</span></label>
         <input type="date" id="geburtsdatum" name="geburtsdatum" required>
 
-        <label for="notfallnummer">Notfalltelefonnummer*</label>
+        <label for="notfallnummer">Notfalltelefonnummer<span class="required">*</span></label>
         <input type="tel" id="notfallnummer" name="notfallnummer" placeholder="z.B. 01234 567890" required>
 
-        <label for="allergien">Allergien*</label>
+        <label for="allergien">Allergien<span class="required">*</span></label>
         <select id="allergien" name="allergien" required>
             <option value="">-- Bitte wählen --</option>
             <option value="keine">Keine</option>
@@ -48,19 +48,16 @@
             <option value="gluten">Gluten</option>
         </select>
 
-        <label for="signature-pad">Unterschrift*</label>
+        <label>Unterschrift<span class="required">*</span></label>
         <canvas id="signature-pad"></canvas>
-        <div class="signature-buttons">
-            <button type="button" class="reset-btn" id="clear-signature">Signatur löschen</button>
-        </div>
-        <input type="hidden" id="signature" name="unterschrift" required>
-
         <div class="checkbox-container">
             <input type="checkbox" id="dsgvo" name="dsgvo" required>
-            <label for="dsgvo">Ich stimme der Datenschutzerklärung (DSGVO) zu*</label>
+            <label for="dsgvo">Ich stimme der Datenschutzerklärung (DSGVO) zu.</label>
         </div>
 
+        <input type="hidden" id="signature" name="unterschrift">
         <button type="submit" id="submit-btn" disabled>Jetzt anmelden</button>
+        <button type="button" id="reset-btn" class="reset-btn">Signatur löschen</button>
     </form>
 </div>
 
