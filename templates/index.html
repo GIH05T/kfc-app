@@ -4,24 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Kinder-Ferien-Club Steinen – Online-Anmeldung</title>
-<style>
-body { font-family: Arial; background:#f2f2f2; margin:0; padding:20px; }
-.container { max-width:600px; margin:auto; background:#fff; padding:25px; border-radius:10px; box-shadow:0 0 10px rgba(0,0,0,0.1);}
-.logo { display:block; margin:0 auto 15px; width:140px; }
-h1,h2 { text-align:center; margin:0; padding:0; }
-h1 { font-size:2em; color:#0060b8;}
-h2 { font-size:1.6em; margin-bottom:20px; color:#7ccc00; font-weight:bold;}
-label { display:block; margin-top:15px; font-weight:bold;}
-label.required::after { content:"*"; color:red; margin-left:2px; }
-input,select { width:100%; padding:10px; margin-top:5px; border-radius:5px; border:1px solid #ccc; font-size:1em;}
-canvas { border:1px solid #ccc; border-radius:5px; width:100%; height:150px; display:block; margin:0 auto; touch-action:none;}
-.checkbox-container { display:flex; align-items:center; margin-top:20px;}
-.checkbox-container input { width:auto; margin-right:10px; }
-button { width:100%; margin-top:25px; padding:12px; font-size:1.2em; border:none; border-radius:5px; cursor:not-allowed; color:white; background:#aaa;}
-button.active { background:#cc0000; cursor:pointer;}
-.reset-btn { width:100%; padding:10px; margin-top:10px; background:#777; color:white; border:none; border-radius:5px; cursor:pointer;}
-.reset-btn:hover { background:#555;}
-</style>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
 
@@ -79,81 +63,7 @@ button.active { background:#cc0000; cursor:pointer;}
 </form>
 </div>
 
-<script>
-const canvas = document.getElementById("signature-pad");
-const ctx = canvas.getContext("2d");
-let drawing = false;
-let hasSignature = false;
-
-// Canvas hochauflösend
-function resizeCanvas() {
-    const ratio = window.devicePixelRatio || 1;
-    canvas.width = canvas.offsetWidth * ratio;
-    canvas.height = canvas.offsetHeight * ratio;
-    ctx.scale(ratio, ratio);
-}
-resizeCanvas();
-window.addEventListener("resize", resizeCanvas);
-
-// Pointer Events für Touch & Maus
-canvas.addEventListener("pointerdown", e => { drawing=true; hasSignature=true; draw(e); checkForm(); });
-canvas.addEventListener("pointermove", draw);
-canvas.addEventListener("pointerup", () => { drawing=false; ctx.beginPath(); });
-canvas.addEventListener("pointerleave", () => { drawing=false; ctx.beginPath(); });
-
-// Zeichnen
-function draw(e){
-    if(!drawing) return;
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    ctx.lineWidth = 2;
-    ctx.lineCap = "round";
-    ctx.strokeStyle = "#000";
-    ctx.lineTo(x,y);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(x,y);
-}
-
-// Signatur zurücksetzen
-function resetSignature(){
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    ctx.beginPath();
-    hasSignature = false;
-    checkForm();
-}
-
-// Form validierung
-const form = document.getElementById("registrationForm");
-const submitBtn = document.getElementById("submitBtn");
-
-function checkForm() {
-    const allValid = form.checkValidity() && hasSignature;
-    if(allValid){
-        submitBtn.classList.add("active");
-        submitBtn.disabled = false;
-    } else {
-        submitBtn.classList.remove("active");
-        submitBtn.disabled = true;
-    }
-}
-
-// Save signature beim Absenden
-form.addEventListener("submit", e => {
-    if(!hasSignature) {
-        alert("Bitte unterschreiben Sie im Feld!");
-        e.preventDefault();
-        return false;
-    }
-    const dataURL = canvas.toDataURL();
-    document.getElementById("signature").value = dataURL;
-});
-
-// Prüfen bei jedem Input
-form.addEventListener("input", checkForm);
-checkForm(); // initial
-</script>
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
 
 </body>
 </html>
