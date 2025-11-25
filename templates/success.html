@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Anmeldung erfolgreich</title>
+<style>
+body { font-family: Arial, sans-serif; background:#f2f2f2; padding:20px; text-align:center; }
+.container { background:white; padding:30px; border-radius:10px; display:inline-block; }
+.id-number { font-size:4em; color:#cc0000; font-weight:bold; margin:20px 0; }
+button { padding:12px 25px; font-size:1em; border:none; border-radius:5px; background:#0060b8; color:white; cursor:pointer; }
+button:hover { background:#004a8c; }
+</style>
+</head>
+<body>
+<div class="container">
+<h2>Danke für die Anmeldung!</h2>
+<p>Ihre Anmelde-ID ist:</p>
+<div class="id-number">{{ reg_id }}</div>
+
+<form action="/" method="get">
+    <button type="submit">Ein weiteres Kind anmelden</button>
+</form>
+</div>
+</body>
+</html>
