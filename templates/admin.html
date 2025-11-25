@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin – Anmeldungen</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+        th { background-color: #eee; }
+        img { max-width: 150px; }
+        a.button { padding:10px 15px; background-color:#007bff; color:white; text-decoration:none; border-radius:5px; }
+        a.button:hover { background-color:#0056b3; }
+    </style>
+</head>
+<body>
+
+<h1>Anmeldeverwaltung</h1>
+<a class="button" href="/export_excel?pw=MEINADMINPASSWORT">Export als Excel</a>
+
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Vorname</th>
+        <th>Nachname</th>
+        <th>Email</th>
+        <th>Ort</th>
+        <th>Geburtsdatum</th>
+        <th>Notfall</th>
+        <th>Allergien</th>
+        <th>Unterschrift</th>
+        <th>QR-Code</th>
+    </tr>
+
+    {% for r in registrations %}
+    <tr>
+        <td>{{ r.ID }}</td>
+        <td>{{ r.Vorname }}</td>
+        <td>{{ r.Nachname }}</td>
+        <td>{{ r.Email }}</td>
+        <td>{{ r.Ort }}</td>
+        <td>{{ r.Geburtsdatum }}</td>
+        <td>{{ r.Notfallnummer }}</td>
+        <td>{{ r.Allergien }}</td>
+        <td><img src="{{ r.Unterschrift }}" alt="Signatur"></td>
+        <td><img src="/static/qrcodes/{{ r.QR_Code }}" alt="QR-Code"></td>
+    </tr>
+    {% endfor %}
+
+</table>
+
+</body>
+</html>
