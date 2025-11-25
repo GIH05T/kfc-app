@@ -4,66 +4,66 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Kinder-Ferien-Club Steinen – Online-Anmeldung</title>
-
-<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
 
 <div class="container">
-<img src="/static/icon-kfc.png" class="logo" alt="Ferienclub Logo">
-<h1>Kinder-Ferien-Club Steinen</h1>
-<h2>Online-Anmeldung</h2>
+    <img src="/static/icon-kfc.png" class="logo" alt="Ferienclub Logo">
+    <h1>Kinder-Ferien-Club Steinen</h1>
+    <h2>Online-Anmeldung</h2>
 
-<form id="registrationForm" action="/" method="POST">
-<label for="Vorname" class="required">Vorname</label>
-<input type="text" id="Vorname" name="Vorname" placeholder="Max" required>
+    <form action="/" method="POST" id="registration-form">
+        <label for="Vorname">Vorname*</label>
+        <input type="text" id="Vorname" name="Vorname" placeholder="Max" required>
 
-<label for="Nachname" class="required">Nachname</label>
-<input type="text" id="Nachname" name="Nachname" placeholder="Mustermann" required>
+        <label for="Nachname">Nachname*</label>
+        <input type="text" id="Nachname" name="Nachname" placeholder="Mustermann" required>
 
-<label for="email">E-Mail</label>
-<input type="email" id="email" name="email" placeholder="max@beispiel.de">
+        <label for="email">E-Mail</label>
+        <input type="email" id="email" name="email" placeholder="max@beispiel.de">
 
-<label for="strasse" class="required">Straße</label>
-<input type="text" id="strasse" name="strasse" placeholder="Musterstraße 12" required>
+        <label for="strasse">Straße*</label>
+        <input type="text" id="strasse" name="strasse" placeholder="Musterstraße 12" required>
 
-<label for="plz" class="required">Postleitzahl</label>
-<input type="text" id="plz" name="plz" placeholder="79665" required>
+        <label for="plz">Postleitzahl*</label>
+        <input type="text" id="plz" name="plz" placeholder="79665" required>
 
-<label for="ort" class="required">Ort</label>
-<input type="text" id="ort" name="ort" placeholder="Steinen" required>
+        <label for="ort">Ort*</label>
+        <input type="text" id="ort" name="ort" placeholder="Steinen" required>
 
-<label for="geburtsdatum" class="required">Geburtsdatum</label>
-<input type="date" id="geburtsdatum" name="geburtsdatum" required>
+        <label for="geburtsdatum">Geburtsdatum*</label>
+        <input type="date" id="geburtsdatum" name="geburtsdatum" required>
 
-<label for="notfallnummer" class="required">Notfalltelefonnummer</label>
-<input type="tel" id="notfallnummer" name="notfallnummer" placeholder="z.B. 01234 567890" required>
+        <label for="notfallnummer">Notfalltelefonnummer*</label>
+        <input type="tel" id="notfallnummer" name="notfallnummer" placeholder="z.B. 01234 567890" required>
 
-<label for="allergien" class="required">Allergien</label>
-<select id="allergien" name="allergien" required>
-<option value="">-- Bitte wählen --</option>
-<option value="keine">Keine</option>
-<option value="nüsse">Nüsse</option>
-<option value="laktose">Laktose</option>
-<option value="ei">Ei</option>
-<option value="gluten">Gluten</option>
-</select>
+        <label for="allergien">Allergien*</label>
+        <select id="allergien" name="allergien" required>
+            <option value="">-- Bitte wählen --</option>
+            <option value="keine">Keine</option>
+            <option value="nüsse">Nüsse</option>
+            <option value="laktose">Laktose</option>
+            <option value="ei">Ei</option>
+            <option value="gluten">Gluten</option>
+        </select>
 
-<label for="signature-pad" class="required">Unterschrift</label>
-<canvas id="signature-pad"></canvas>
-<button type="button" class="reset-btn" onclick="resetSignature()">Signatur löschen</button>
-<input type="hidden" id="signature" name="unterschrift">
+        <label for="signature-pad">Unterschrift*</label>
+        <canvas id="signature-pad"></canvas>
+        <div class="signature-buttons">
+            <button type="button" class="reset-btn" id="clear-signature">Signatur löschen</button>
+        </div>
+        <input type="hidden" id="signature" name="unterschrift" required>
 
-<div class="checkbox-container">
-<input type="checkbox" id="dsgvo" name="dsgvo" required>
-<label for="dsgvo">Ich stimme der Datenschutzerklärung (DSGVO) zu.</label>
+        <div class="checkbox-container">
+            <input type="checkbox" id="dsgvo" name="dsgvo" required>
+            <label for="dsgvo">Ich stimme der Datenschutzerklärung (DSGVO) zu*</label>
+        </div>
+
+        <button type="submit" id="submit-btn" disabled>Jetzt anmelden</button>
+    </form>
 </div>
 
-<button type="submit" id="submitBtn">Jetzt anmelden</button>
-</form>
-</div>
-
-<script src="{{ url_for('static', filename='js/script.js') }}"></script>
-
+<script src="/static/script.js"></script>
 </body>
 </html>
