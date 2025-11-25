@@ -3,66 +3,81 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Adminbereich</title>
+<title>Adminbereich – Kinder-Ferien-Club</title>
 <style>
-body { font-family: Arial, sans-serif; background:#f2f2f2; padding:20px; }
-.container { max-width:900px; margin:auto; background:white; padding:25px; border-radius:10px; box-shadow:0 0 10px rgba(0,0,0,0.1); }
-table { width:100%; border-collapse: collapse; margin-top:20px; }
-th, td { border:1px solid #ccc; padding:8px; text-align:left; vertical-align:top; }
-th { background:#0060b8; color:white; }
-input { padding:8px; width:220px; margin-bottom:10px; }
-img.signature { max-width:150px; max-height:80px; }
-.empty-msg { padding:20px; background:#ffe2e2; border:1px solid #ff9b9b; border-radius:8px; margin-top:20px; }
+body { font-family: Arial; background:#f2f2f2; margin:0; padding:20px;}
+.container { max-width:1000px; margin:auto; background:#fff; padding:25px; border-radius:10px; box-shadow:0 0 10px rgba(0,0,0,0.1);}
+h1 { text-align:center; color:#0060b8;}
+input[type="text"] { width:100%; padding:8px; margin:10px 0; border-radius:5px; border:1px solid #ccc;}
+table { width:100%; border-collapse:collapse; margin-top:15px;}
+th, td { border:1px solid #ccc; padding:8px; text-align:left; }
+th { background:#f0f0f0;}
+img.signatur { max-width:150px; max-height:80px; border:1px solid #ccc; border-radius:4px;}
+.export-btn { margin:5px 0; padding:8px 12px; background:#cc0000; color:white; border:none; border-radius:5px; cursor:pointer;}
+.export-btn:hover { background:#aa0000;}
 </style>
 </head>
 <body>
 <div class="container">
-<h1>Adminbereich</h1>
+<h1>Adminbereich – Kinder-Ferien-Club</h1>
 
-<!-- Suchfeld -->
-<form method="get">
-    <input type="hidden" name="pw" value="MEINADMINPASSWORT">
-    <input type="text" name="search" placeholder="Suche nach Vorname, Nachname oder ID" value="{{ search_query }}">
-    <button type="submit">Suchen</button>
+<label for="search">Suche nach Vorname, Nachname oder ID:</label>
+<input type="text" id="search" placeholder="Suche...">
+
+<div id="export-buttons">
+<!-- 12 Export Buttons -->
+{% for i in range(1,13) %}
+<form style="display:inline;" action="/export_excel" method="get">
+    <input type="hidden" name="pw" value="{{ request.args.get('pw') }}">
+    <button type="submit" class="export-btn">Export {{i}}</button>
 </form>
-
-<!-- Falls keine Anmeldungen existieren -->
-{% if not registrations %}
-<div class="empty-msg">
-    Noch keine Anmeldungen vorhanden.
+{% endfor %}
 </div>
-{% else %}
 
-<!-- Tabelle -->
-<table>
+<table id="registration-table">
+<thead>
 <tr>
-    {% for key in registrations[0].keys() %}
-        <th>{{ key }}</th>
-    {% endfor %}
+<th>ID</th><th>Vorname</th><th>Nachname</th><th>Email</th><th>Straße</th><th>PLZ</th><th>Ort</th><th>Geburtsdatum</th><th>Notfallnummer</th><th>Allergien</th><th>Signatur</th><th>DSGVO</th>
 </tr>
-
+</thead>
+<tbody>
 {% for r in registrations %}
 <tr>
-    {% for key in registrations[0].keys() %}
-        <td>
-            {% set val = r.get(key) %}
-
-            {% if key == "Unterschrift" and val %}
-                <img class="signature" src="{{ val }}">
-            {% else %}
-                {{ val if val else "" }}
-            {% endif %}
-        </td>
-    {% endfor %}
+<td>{{ r.get('ID','') }}</td>
+<td>{{ r.get('Vorname','') }}</td>
+<td>{{ r.get('Nachname','') }}</td>
+<td>{{ r.get('Email','') }}</td>
+<td>{{ r.get('Strasse','') }}</td>
+<td>{{ r.get('PLZ','') }}</td>
+<td>{{ r.get('Ort','') }}</td>
+<td>{{ r.get('Geburtsdatum','') }}</td>
+<td>{{ r.get('Notfallnummer','') }}</td>
+<td>{{ r.get('Allergien','') }}</td>
+<td>
+{% if r.get('Unterschrift') %}
+<img class="signatur" src="{{ r.get('Unterschrift') }}" alt="Signatur">
+{% else %}-{% endif %}
+</td>
+<td>{{ 'Ja' if r.get('DSGVO') else 'Nein' }}</td>
 </tr>
 {% endfor %}
+</tbody>
 </table>
-
-{% endif %}
-
-<br>
-<a href="/export_excel?pw=MEINADMINPASSWORT">Excel Export</a>
-
 </div>
+
+<script>
+const searchInput = document.getElementById("search");
+searchInput.addEventListener("input", function(){
+    const filter = this.value.toLowerCase();
+    const rows = document.querySelectorAll("#registration-table tbody tr");
+    rows.forEach(row=>{
+        const cells = row.querySelectorAll("td");
+        const text = cells[0].innerText.toLowerCase()+" "+
+                     cells[1].innerText.toLowerCase()+" "+
+                     cells[2].innerText.toLowerCase();
+        row.style.display = text.includes(filter) ? "" : "none";
+    });
+});
+</script>
 </body>
 </html>
