@@ -8,38 +8,61 @@
 body { font-family: Arial, sans-serif; background:#f2f2f2; padding:20px; }
 .container { max-width:900px; margin:auto; background:white; padding:25px; border-radius:10px; box-shadow:0 0 10px rgba(0,0,0,0.1); }
 table { width:100%; border-collapse: collapse; margin-top:20px; }
-th, td { border:1px solid #ccc; padding:8px; text-align:left; }
+th, td { border:1px solid #ccc; padding:8px; text-align:left; vertical-align:top; }
 th { background:#0060b8; color:white; }
-input { padding:8px; width:200px; margin-bottom:10px; }
+input { padding:8px; width:220px; margin-bottom:10px; }
+img.signature { max-width:150px; max-height:80px; }
+.empty-msg { padding:20px; background:#ffe2e2; border:1px solid #ff9b9b; border-radius:8px; margin-top:20px; }
 </style>
 </head>
 <body>
 <div class="container">
 <h1>Adminbereich</h1>
 
+<!-- Suchfeld -->
 <form method="get">
     <input type="hidden" name="pw" value="MEINADMINPASSWORT">
     <input type="text" name="search" placeholder="Suche nach Vorname, Nachname oder ID" value="{{ search_query }}">
     <button type="submit">Suchen</button>
 </form>
 
+<!-- Falls keine Anmeldungen existieren -->
+{% if not registrations %}
+<div class="empty-msg">
+    Noch keine Anmeldungen vorhanden.
+</div>
+{% else %}
+
+<!-- Tabelle -->
 <table>
 <tr>
-{% for key in registrations[0].keys() %}
-<th>{{ key }}</th>
-{% endfor %}
+    {% for key in registrations[0].keys() %}
+        <th>{{ key }}</th>
+    {% endfor %}
 </tr>
 
 {% for r in registrations %}
 <tr>
-{% for val in r.values() %}
-<td>{{ val if val not in ['Unterschrift'] else '[Bild]' }}</td>
-{% endfor %}
+    {% for key in registrations[0].keys() %}
+        <td>
+            {% set val = r.get(key) %}
+
+            {% if key == "Unterschrift" and val %}
+                <img class="signature" src="{{ val }}">
+            {% else %}
+                {{ val if val else "" }}
+            {% endif %}
+        </td>
+    {% endfor %}
 </tr>
 {% endfor %}
 </table>
 
+{% endif %}
+
+<br>
 <a href="/export_excel?pw=MEINADMINPASSWORT">Excel Export</a>
+
 </div>
 </body>
 </html>
