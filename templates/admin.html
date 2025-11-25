@@ -5,60 +5,60 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Adminbereich – Kinder-Ferien-Club</title>
 <style>
-body { font-family: Arial; background:#f2f2f2; margin:0; padding:20px;}
-.container { max-width:1000px; margin:auto; background:#fff; padding:25px; border-radius:10px; box-shadow:0 0 10px rgba(0,0,0,0.1);}
-h1 { text-align:center; color:#0060b8;}
-input[type="text"] { width:100%; padding:8px; margin:10px 0; border-radius:5px; border:1px solid #ccc;}
+body { font-family: Arial; background:#f2f2f2; margin:0; padding:20px; }
+.container { max-width:900px; margin:auto; background:#fff; padding:25px; border-radius:10px; box-shadow:0 0 10px rgba(0,0,0,0.1);}
+h1 { text-align:center; color:#0060b8; margin-bottom:20px;}
+input[type="text"] { width:100%; padding:10px; margin-bottom:15px; border-radius:5px; border:1px solid #ccc; font-size:1em;}
 table { width:100%; border-collapse:collapse; margin-top:15px;}
-th, td { border:1px solid #ccc; padding:8px; text-align:left; }
+th, td { border:1px solid #ccc; padding:8px; text-align:left; vertical-align:top;}
 th { background:#f0f0f0;}
-img.signatur { max-width:150px; max-height:80px; border:1px solid #ccc; border-radius:4px;}
-.export-btn { margin:5px 0; padding:8px 12px; background:#cc0000; color:white; border:none; border-radius:5px; cursor:pointer;}
-.export-btn:hover { background:#aa0000;}
+img.signature { width:150px; height:auto; border:1px solid #ccc; border-radius:5px;}
+.export-btn { display:inline-block; padding:10px 20px; background:red; color:white; border:none; border-radius:5px; cursor:pointer; margin-bottom:15px; text-decoration:none;}
+.export-btn:hover { background:#aa0000; }
 </style>
 </head>
 <body>
+
 <div class="container">
 <h1>Adminbereich – Kinder-Ferien-Club</h1>
 
-<label for="search">Suche nach Vorname, Nachname oder ID:</label>
-<input type="text" id="search" placeholder="Suche...">
+<label for="search">Suchen nach Vorname, Nachname oder ID:</label>
+<input type="text" id="search" placeholder="Suchbegriff eingeben...">
 
-<div id="export-buttons">
-<!-- 12 Export Buttons -->
-{% for i in range(1,13) %}
-<form style="display:inline;" action="/export_excel" method="get">
-    <input type="hidden" name="pw" value="{{ request.args.get('pw') }}">
-    <button type="submit" class="export-btn">Export {{i}}</button>
-</form>
-{% endfor %}
-</div>
+<a href="/export_excel?pw=MEINADMINPASSWORT" class="export-btn">Excel exportieren</a>
 
-<table id="registration-table">
+<table id="reg-table">
 <thead>
 <tr>
-<th>ID</th><th>Vorname</th><th>Nachname</th><th>Email</th><th>Straße</th><th>PLZ</th><th>Ort</th><th>Geburtsdatum</th><th>Notfallnummer</th><th>Allergien</th><th>Signatur</th><th>DSGVO</th>
+<th>ID</th>
+<th>Vorname</th>
+<th>Nachname</th>
+<th>Email</th>
+<th>Straße</th>
+<th>PLZ</th>
+<th>Ort</th>
+<th>Geburtsdatum</th>
+<th>Notfallnummer</th>
+<th>Allergien</th>
+<th>Signatur</th>
+<th>DSGVO</th>
 </tr>
 </thead>
 <tbody>
 {% for r in registrations %}
 <tr>
-<td>{{ r.get('ID','') }}</td>
-<td>{{ r.get('Vorname','') }}</td>
-<td>{{ r.get('Nachname','') }}</td>
-<td>{{ r.get('Email','') }}</td>
-<td>{{ r.get('Strasse','') }}</td>
-<td>{{ r.get('PLZ','') }}</td>
-<td>{{ r.get('Ort','') }}</td>
-<td>{{ r.get('Geburtsdatum','') }}</td>
-<td>{{ r.get('Notfallnummer','') }}</td>
-<td>{{ r.get('Allergien','') }}</td>
-<td>
-{% if r.get('Unterschrift') %}
-<img class="signatur" src="{{ r.get('Unterschrift') }}" alt="Signatur">
-{% else %}-{% endif %}
-</td>
-<td>{{ 'Ja' if r.get('DSGVO') else 'Nein' }}</td>
+<td>{{ r.ID }}</td>
+<td>{{ r.Vorname }}</td>
+<td>{{ r.Nachname }}</td>
+<td>{{ r.Email }}</td>
+<td>{{ r.Strasse }}</td>
+<td>{{ r.PLZ }}</td>
+<td>{{ r.Ort }}</td>
+<td>{{ r.Geburtsdatum }}</td>
+<td>{{ r.Notfallnummer }}</td>
+<td>{{ r.Allergien }}</td>
+<td>{% if r.Unterschrift %}<img src="{{ r.Unterschrift }}" class="signature">{% else %}Keine{% endif %}</td>
+<td>{{ 'Ja' if r.DSGVO else 'Nein' }}</td>
 </tr>
 {% endfor %}
 </tbody>
@@ -66,18 +66,22 @@ img.signatur { max-width:150px; max-height:80px; border:1px solid #ccc; border-r
 </div>
 
 <script>
-const searchInput = document.getElementById("search");
-searchInput.addEventListener("input", function(){
-    const filter = this.value.toLowerCase();
-    const rows = document.querySelectorAll("#registration-table tbody tr");
-    rows.forEach(row=>{
-        const cells = row.querySelectorAll("td");
-        const text = cells[0].innerText.toLowerCase()+" "+
-                     cells[1].innerText.toLowerCase()+" "+
-                     cells[2].innerText.toLowerCase();
-        row.style.display = text.includes(filter) ? "" : "none";
+const searchInput = document.getElementById('search');
+searchInput.addEventListener('input', function() {
+    const filter = searchInput.value.toLowerCase();
+    const rows = document.querySelectorAll('#reg-table tbody tr');
+    rows.forEach(row => {
+        const id = row.cells[0].textContent.toLowerCase();
+        const vorname = row.cells[1].textContent.toLowerCase();
+        const nachname = row.cells[2].textContent.toLowerCase();
+        if(id.includes(filter) || vorname.includes(filter) || nachname.includes(filter)) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
     });
 });
 </script>
+
 </body>
 </html>
