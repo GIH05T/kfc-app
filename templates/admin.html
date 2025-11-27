@@ -1,87 +1,153 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Adminbereich – Kinder-Ferien-Club</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin – Kinder-Ferien-Club</title>
+<link rel="stylesheet" href="/static/style.css">
 <style>
-body { font-family: Arial; background:#f2f2f2; margin:0; padding:20px; }
-.container { max-width:900px; margin:auto; background:#fff; padding:25px; border-radius:10px; box-shadow:0 0 10px rgba(0,0,0,0.1);}
-h1 { text-align:center; color:#0060b8; margin-bottom:20px;}
-input[type="text"] { width:100%; padding:10px; margin-bottom:15px; border-radius:5px; border:1px solid #ccc; font-size:1em;}
-table { width:100%; border-collapse:collapse; margin-top:15px;}
-th, td { border:1px solid #ccc; padding:8px; text-align:left; vertical-align:top;}
-th { background:#f0f0f0;}
-img.signature { width:150px; height:auto; border:1px solid #ccc; border-radius:5px;}
-.export-btn { display:inline-block; padding:10px 20px; background:red; color:white; border:none; border-radius:5px; cursor:pointer; margin-bottom:15px; text-decoration:none;}
-.export-btn:hover { background:#aa0000; }
+/* kleine Ergänzungen für Admin-Tabelle */
+.table-controls { display:flex; gap:10px; align-items:center; margin-bottom:12px;}
+#search { flex:1; padding:8px; border:1px solid #ccc; border-radius:6px;}
+.save-btn { padding:8px 12px; background:#0060b8; color:white; border:none; border-radius:6px; cursor:pointer;}
+.row-delete { background:#d9534f; color:white; border:none; padding:6px 8px; border-radius:4px; cursor:pointer;}
+.small-input { width:100px; }
+.checkbox-cell { text-align:center; }
+.signature-thumb { max-width:160px; max-height:80px; border:1px solid #ccc; border-radius:4px; }
+.points { font-weight:bold; text-align:center; }
+.gender-select { width:70px; }
+.id-cell { width:60px; text-align:center; font-weight:bold;}
 </style>
 </head>
 <body>
-
 <div class="container">
-<h1>Adminbereich – Kinder-Ferien-Club</h1>
+  <h1>Adminbereich – Kinder-Ferien-Club</h1>
 
-<label for="search">Suchen nach Vorname, Nachname oder ID:</label>
-<input type="text" id="search" placeholder="Suchbegriff eingeben...">
+  <div class="table-controls">
+    <input id="search" type="text" placeholder="Suche nach ID, Vorname, Nachname...">
+    <form id="saveForm" method="POST" action="/admin/save?pw={{ request.args.get('pw') }}">
+      <button type="submit" class="save-btn">💾 Änderungen speichern</button>
+    </form>
+  </div>
 
-<a href="/export_excel?pw=MEINADMINPASSWORT" class="export-btn">Excel exportieren</a>
+  <table style="width:100%; border-collapse:collapse;">
+    <thead>
+      <tr>
+        <th class="id-cell">Lfd. Nr.</th>
+        <th>M/W</th>
+        <th>Vorname</th>
+        <th>Nachname</th>
+        <th>Geburtsdatum</th>
+        <th>Alter</th>
+        <th>Gruppe</th>
+        <th style="text-align:center">Anwesenheit<br>(Mo-Fr)</th>
+        <th style="text-align:center">Verse<br>(Mo-Fr)</th>
+        <th style="text-align:center">Punkte</th>
+        <th>Unterschrift</th>
+        <th>Aktion</th>
+      </tr>
+    </thead>
+    <tbody id="reg-body">
+    <form id="bulkForm" method="POST" action="/admin/save?pw={{ request.args.get('pw') }}">
+    {% for r in registrations %}
+      <tr class="reg-row">
+        <td class="id-cell">{{ r.ID }}</td>
 
-<table id="reg-table">
-<thead>
-<tr>
-<th>ID</th>
-<th>Vorname</th>
-<th>Nachname</th>
-<th>Email</th>
-<th>Straße</th>
-<th>PLZ</th>
-<th>Ort</th>
-<th>Geburtsdatum</th>
-<th>Notfallnummer</th>
-<th>Allergien</th>
-<th>Signatur</th>
-<th>DSGVO</th>
-</tr>
-</thead>
-<tbody>
-{% for r in registrations %}
-<tr>
-<td>{{ r.ID }}</td>
-<td>{{ r.Vorname }}</td>
-<td>{{ r.Nachname }}</td>
-<td>{{ r.Email }}</td>
-<td>{{ r.Strasse }}</td>
-<td>{{ r.PLZ }}</td>
-<td>{{ r.Ort }}</td>
-<td>{{ r.Geburtsdatum }}</td>
-<td>{{ r.Notfallnummer }}</td>
-<td>{{ r.Allergien }}</td>
-<td>{% if r.Unterschrift %}<img src="{{ r.Unterschrift }}" class="signature">{% else %}Keine{% endif %}</td>
-<td>{{ 'Ja' if r.DSGVO else 'Nein' }}</td>
-</tr>
-{% endfor %}
-</tbody>
-</table>
+        <!-- Gender -->
+        <td>
+          <select name="Gender_{{ r.ID }}" class="gender-select">
+            <option value="">-</option>
+            <option value="M" {% if r.Gender == "M" %}selected{% endif %}>M</option>
+            <option value="W" {% if r.Gender == "W" %}selected{% endif %}>W</option>
+          </select>
+        </td>
+
+        <!-- Vorname -->
+        <td><input type="text" name="Vorname_{{ r.ID }}" value="{{ r.Vorname or '' }}"></td>
+
+        <!-- Nachname -->
+        <td><input type="text" name="Nachname_{{ r.ID }}" value="{{ r.Nachname or '' }}"></td>
+
+        <!-- Geburtsdatum -->
+        <td><input type="date" name="Geburtsdatum_{{ r.ID }}" value="{{ r.Geburtsdatum or '' }}"></td>
+
+        <!-- Age (computed) -->
+        <td style="text-align:center;">{{ r.Age if r.Age is not none else '' }}</td>
+
+        <!-- Group (computed) -->
+        <td style="text-align:center;">{{ r.Group if r.Group else '' }}</td>
+
+        <!-- Anwesenheit checkboxes -->
+        <td class="checkbox-cell">
+          {% set days = r.days %}
+          <label><input type="checkbox" name="mo_{{ r.ID }}" {% if days.mo %}checked{% endif %}></label>
+          <label><input type="checkbox" name="di_{{ r.ID }}" {% if days.di %}checked{% endif %}></label>
+          <label><input type="checkbox" name="mi_{{ r.ID }}" {% if days.mi %}checked{% endif %}></label>
+          <label><input type="checkbox" name="do_{{ r.ID }}" {% if days.do %}checked{% endif %}></label>
+          <label><input type="checkbox" name="fr_{{ r.ID }}" {% if days.fr %}checked{% endif %}></label>
+        </td>
+
+        <!-- Verse checkboxes -->
+        <td class="checkbox-cell">
+          {% set verses = r.verses %}
+          <label><input type="checkbox" name="v_mo_{{ r.ID }}" {% if verses.mo %}checked{% endif %}></label>
+          <label><input type="checkbox" name="v_di_{{ r.ID }}" {% if verses.di %}checked{% endif %}></label>
+          <label><input type="checkbox" name="v_mi_{{ r.ID }}" {% if verses.mi %}checked{% endif %}></label>
+          <label><input type="checkbox" name="v_do_{{ r.ID }}" {% if verses.do %}checked{% endif %}></label>
+          <label><input type="checkbox" name="v_fr_{{ r.ID }}" {% if verses.fr %}checked{% endif %}></label>
+        </td>
+
+        <!-- Points -->
+        <td class="points">{{ r.Points }}</td>
+
+        <!-- Signature (image) -->
+        <td>
+          {% if r.Unterschrift %}
+            <img src="{{ r.Unterschrift }}" class="signature-thumb" alt="Signatur {{ r.ID }}">
+          {% else %}
+            -
+          {% endif %}
+        </td>
+
+        <!-- Delete -->
+        <td>
+          <form method="POST" action="/admin/delete/{{ r.ID }}?pw={{ request.args.get('pw') }}" onsubmit="return confirm('Kind mit ID {{ r.ID }} wirklich löschen?')">
+            <button type="submit" class="row-delete">Löschen</button>
+          </form>
+        </td>
+      </tr>
+    {% endfor %}
+    </form>
+    </tbody>
+  </table>
+
 </div>
 
 <script>
-const searchInput = document.getElementById('search');
-searchInput.addEventListener('input', function() {
-    const filter = searchInput.value.toLowerCase();
-    const rows = document.querySelectorAll('#reg-table tbody tr');
-    rows.forEach(row => {
-        const id = row.cells[0].textContent.toLowerCase();
-        const vorname = row.cells[1].textContent.toLowerCase();
-        const nachname = row.cells[2].textContent.toLowerCase();
-        if(id.includes(filter) || vorname.includes(filter) || nachname.includes(filter)) {
-            row.style.display = '';
-        } else {
-            row.style.display = 'none';
-        }
-    });
+// Suche
+const searchEl = document.getElementById('search');
+searchEl.addEventListener('input', () => {
+  const q = searchEl.value.trim().toLowerCase();
+  document.querySelectorAll('#reg-body tr.reg-row').forEach(row => {
+    const id = row.cells[0].innerText.toLowerCase();
+    const vor = row.cells[2].querySelector('input').value.toLowerCase();
+    const nach = row.cells[3].querySelector('input').value.toLowerCase();
+    if (id.includes(q) || vor.includes(q) || nach.includes(q)) {
+      row.style.display = '';
+    } else {
+      row.style.display = 'none';
+    }
+  });
+});
+
+// Damit Save-Button oben das gleiche Form submitten kann:
+const saveBtnForm = document.getElementById('saveForm');
+const bulkForm = document.getElementById('bulkForm');
+saveBtnForm.addEventListener('submit', (e) => {
+  e.preventDefault();
+  // submit the bulk form
+  bulkForm.submit();
 });
 </script>
-
 </body>
 </html>

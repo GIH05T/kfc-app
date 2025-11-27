@@ -1,71 +1,59 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kinder-Ferien-Club Steinen – Online-Anmeldung</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Anmeldung – Kinder-Ferien-Club</title>
 <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-
 <div class="container">
-    <img src="/static/icon-kfc.png" class="logo" alt="Ferienclub Logo">
-    <h1>Kinder-Ferien-Club Steinen</h1>
-    <h2>Online-Anmeldung</h2>
+  <img src="/static/icon-kfc.png" class="logo" alt="Logo">
+  <h1>Kinder-Ferien-Club – Anmeldung</h1>
 
-    <form id="registration-form" action="/" method="POST">
-        <label for="Vorname">Vorname<span class="required">*</span></label>
-        <input type="text" id="Vorname" name="Vorname" placeholder="Max" required>
+  {% if success %}
+    <div style="background:#e8ffd8;border:1px solid #b6e6a0;padding:10px;margin-bottom:12px;">
+      Danke! Anmeldung eingegangen. ID: <strong>{{ reg_id }}</strong>
+    </div>
+  {% endif %}
 
-        <label for="Nachname">Nachname<span class="required">*</span></label>
-        <input type="text" id="Nachname" name="Nachname" placeholder="Mustermann" required>
+  <form method="POST" action="/">
+    <label>Vorname*</label>
+    <input name="Vorname" required>
 
-        <label for="email">E-Mail</label>
-        <input type="email" id="email" name="email" placeholder="max@beispiel.de">
+    <label>Nachname*</label>
+    <input name="Nachname" required>
 
-        <label for="strasse">Straße<span class="required">*</span></label>
-        <input type="text" id="strasse" name="strasse" placeholder="Musterstraße 12" required>
+    <label>E-Mail</label>
+    <input name="email" type="email">
 
-        <label for="plz">Postleitzahl<span class="required">*</span></label>
-        <input type="text" id="plz" name="plz" placeholder="79665" required>
+    <label>Straße*</label>
+    <input name="strasse" required>
 
-        <label for="ort">Ort<span class="required">*</span></label>
-        <input type="text" id="ort" name="ort" placeholder="Steinen" required>
+    <label>PLZ*</label>
+    <input name="plz" required>
 
-        <label for="geburtsdatum">Geburtsdatum<span class="required">*</span></label>
-        <input type="date" id="geburtsdatum" name="geburtsdatum" required>
+    <label>Ort*</label>
+    <input name="ort" required>
 
-        <label for="notfallnummer">Notfalltelefonnummer<span class="required">*</span></label>
-        <input type="tel" id="notfallnummer" name="notfallnummer" placeholder="z.B. 01234 567890" required>
+    <label>Geburtsdatum*</label>
+    <input name="geburtsdatum" type="date" required>
 
-        <label for="allergien">Allergien<span class="required">*</span></label>
-        <select id="allergien" name="allergien" required>
-            <option value="">-- Bitte wählen --</option>
-            <option value="keine">Keine</option>
-            <option value="nüsse">Nüsse</option>
-            <option value="laktose">Laktose</option>
-            <option value="ei">Ei</option>
-            <option value="gluten">Gluten</option>
-        </select>
+    <label>Notfallnummer*</label>
+    <input name="notfallnummer" required>
 
-        <label>Unterschrift<span class="required">*</span></label>
-        <canvas id="signature-pad"></canvas>
-        <!-- Signatur löschen Button direkt unter Canvas -->
-        <button type="button" id="reset-btn" class="reset-btn">Signatur löschen</button>
+    <label>Allergien</label>
+    <input name="allergien">
 
-        <div class="checkbox-container">
-			<input type="checkbox" id="dsgvo" name="dsgvo" required>
-			<label for="dsgvo"> Ich stimme der <a href="/datenschutz" target="_blank"> 
-			Datenschutzerklärung </a> zu <span class="required">*</span>
-		</label>
+    <label>Unterschrift*</label>
+    <textarea name="unterschrift" placeholder="Bei dir ist eine Canvas-Integration."></textarea>
+
+    <div style="margin-top:10px;">
+      <input type="checkbox" name="dsgvo" required> Ich stimme der Datenschutzerklärung zu *
+    </div>
+
+    <button type="submit" style="margin-top:12px;">Jetzt anmelden</button>
+  </form>
 </div>
-
-
-        <input type="hidden" id="signature" name="unterschrift">
-        <button type="submit" id="submit-btn" disabled>Jetzt anmelden</button>
-    </form>
-</div>
-
-<script src="/static/script.js"></script>
 </body>
 </html>
