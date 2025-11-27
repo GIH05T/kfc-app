@@ -1,3 +1,4 @@
+/* Grundlayout */
 body {
     font-family: Arial, sans-serif;
     background: #f2f2f2;
@@ -6,35 +7,118 @@ body {
 }
 
 .container {
-    max-width: 1100px;
+    max-width: 600px;
     margin: auto;
     background: #fff;
-    padding: 20px;
+    padding: 25px;
     border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.08);
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
 
+/* Logo */
 .logo {
     display: block;
-    margin: 0 auto 12px;
-    width: 120px;
+    margin: 0 auto 15px;
+    width: 140px;
 }
 
-h1 { text-align:center; color:#0060b8; margin:0 0 12px 0; }
-h2 { text-align:center; color:#7ccc00; margin:0 0 12px 0; }
-
-label { display:block; margin-top:10px; font-weight:bold; }
-input[type="text"], input[type="email"], input[type="date"], select, textarea {
-    width:100%; padding:8px; margin-top:6px; border:1px solid #ccc; border-radius:6px;
+/* Überschriften */
+h1, h2 {
+    text-align: center;
+    margin: 0;
+    padding: 0;
 }
-button { padding:10px 14px; border-radius:6px; border:none; background:#0060b8; color:white; cursor:pointer;}
-button:hover { opacity:0.95; }
 
-.reset-btn { background:#777; color:white; padding:8px 10px; border-radius:6px; border:none; cursor:pointer;}
-.reset-btn:hover { background:#555; }
-.save-btn { background:#0060b8; color:white; border:none; padding:8px 10px; border-radius:6px; cursor:pointer;}
+h1 {
+    font-size: 2em;
+    color: #0060b8;
+}
 
-table { width:100%; border-collapse:collapse; margin-top:12px; }
-table th, table td { border:1px solid #e5e5e5; padding:8px; vertical-align:middle; }
-table th { background:#fafafa; text-align:left; }
-.small { width:60px; }
+h2 {
+    font-size: 1.6em;
+    margin-bottom: 20px;
+    color: #7ccc00;
+    font-weight: bold;
+}
+
+/* Formulare */
+label {
+    display: block;
+    margin-top: 15px;
+    font-weight: bold;
+}
+
+.required {
+    color: red;
+    margin-left: 2px;
+}
+
+input, select {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 1em;
+}
+
+/* Signatur */
+canvas#signature-pad {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 100%;
+    height: 150px;
+    display: block;
+    margin: 0 auto;
+    touch-action: none;
+}
+
+/* Signatur löschen Button */
+.reset-btn {
+    margin-top: 8px; /* Abstand unter Canvas */
+    width: 100%;
+    padding: 10px;
+    background: #777;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.reset-btn:hover {
+    background: #555;
+}
+
+/* Checkbox DSGVO */
+.checkbox-container {
+    display: flex;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.checkbox-container input {
+    width: auto;
+    margin-right: 10px;
+}
+
+/* Submit Button */
+button[type="submit"] {
+    width: 100%;
+    margin-top: 25px;
+    padding: 12px;
+    background: #cc0000;
+    color: white;
+    font-size: 1.2em;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button[type="submit"]:hover {
+    background: #aa0000;
+}
+
+/* Disabled Submit */
+button[disabled] {
+    background: #aaa;
+    cursor: not-allowed;
+}
