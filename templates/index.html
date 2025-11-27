@@ -54,9 +54,12 @@
         <button type="button" id="reset-btn" class="reset-btn">Signatur löschen</button>
 
         <div class="checkbox-container">
-            <input type="checkbox" id="dsgvo" name="dsgvo" required>
-            <label for="dsgvo">Ich stimme der Datenschutzerklärung (DSGVO) zu.</label>
-        </div>
+			<input type="checkbox" id="dsgvo" name="dsgvo" required>
+			<label for="dsgvo"> Ich stimme der <a href="/datenschutz" target="_blank"> 
+			Datenschutzerklärung </a> zu <span class="required">*</span>
+		</label>
+</div>
+
 
         <input type="hidden" id="signature" name="unterschrift">
         <button type="submit" id="submit-btn" disabled>Jetzt anmelden</button>

@@ -75,6 +75,11 @@ def admin():
 
     return render_template("admin.html", registrations=registrations, search_query=search_query)
 
+@app.route("/datenschutz")
+def datenschutz():
+    return render_template("datenschutz.html")
+
+
 # --- Excel Export mit Signaturen ---
 @app.route("/export_excel")
 def export_excel():
