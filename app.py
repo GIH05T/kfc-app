@@ -1,221 +1,124 @@
-from flask import Flask, render_template, request, redirect, url_for, abort, jsonify
-import json
-import os
-from datetime import datetime, date
+from flask import Flask, render_template, request, redirect, url_for, send_file
+import json, os
+from openpyxl import Workbook
+from openpyxl.drawing.image import Image as XLImage
+import base64
+from io import BytesIO
 
 app = Flask(__name__)
 
 DATA_FILE = "registrations.json"
+ADMIN_PASSWORD = "MEINADMINPASSWORT"
 
-# --- Hilfsfunktionen: Laden / Speichern ---
+# --- JSON Laden/Speichern ---
 def load_data():
     if not os.path.exists(DATA_FILE):
         return []
     with open(DATA_FILE, "r", encoding="utf-8") as f:
-        try:
-            return json.load(f)
-        except Exception:
-            return []
+        return json.load(f)
 
 def save_data(data):
     with open(DATA_FILE, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
+        json.dump(data, f, indent=4, ensure_ascii=False)
 
-# --- ID-Generierung: kleinste freie positive ganze Zahl ---
+# --- ID generieren ---
 def generate_id():
-    regs = load_data()
-    used = sorted([r.get("ID", 0) for r in regs if isinstance(r.get("ID", None), int)])
-    i = 1
-    for u in used:
-        if u == i:
-            i += 1
-        elif u > i:
-            break
-    return i
-
-# --- Alter berechnen aus Geburtsdatum (YYYY-MM-DD) ---
-def calc_age(birthdate_str):
-    if not birthdate_str:
-        return None
-    try:
-        bd = datetime.strptime(birthdate_str, "%Y-%m-%d").date()
-    except Exception:
-        return None
-    today = date.today()
-    age = today.year - bd.year - ((today.month, today.day) < (bd.month, bd.day))
-    return age
-
-# --- Gruppe bestimmen (5-7 oder 8-13) ---
-def group_for_age(age):
-    if age is None:
-        return None
-    if 5 <= age <= 7:
-        return "5-7"
-    elif 8 <= age <= 13:
-        return "8-13"
+    registrations = load_data()
+    if not registrations:
+        return 1
     else:
-        return None
+        return max(r["ID"] for r in registrations) + 1
 
-# --- Punkte berechnen aus days + verses (beide dicts mit mo..fr boolean/int) ---
-def compute_points(reg):
-    days = reg.get("days", {})
-    verses = reg.get("verses", {})
-    days_count = sum(1 for k in ["mo","di","mi","do","fr"] if days.get(k))
-    verses_count = sum(1 for k in ["mo","di","mi","do","fr"] if verses.get(k))
-    return days_count + verses_count
-
-# --- Startseite / Anmeldung (minimal, damit Admin funktioniert) ---
+# --- Routes ---
 @app.route("/", methods=["GET", "POST"])
 def index():
     if request.method == "POST":
-        regs = load_data()
+        registrations = load_data()
         reg_id = generate_id()
-        # Daten aus Formular
-        vorname = request.form.get("Vorname", "").strip()
-        nachname = request.form.get("Nachname", "").strip()
-        email = request.form.get("email", "").strip()
-        strasse = request.form.get("strasse", "").strip()
-        plz = request.form.get("plz", "").strip()
-        ort = request.form.get("ort", "").strip()
-        geburtsdatum = request.form.get("geburtsdatum", "").strip()
-        notfall = request.form.get("notfallnummer", "").strip()
-        allergien = request.form.get("allergien", "").strip()
-        unterschrift = request.form.get("unterschrift", "").strip()  # dataURL
-        dsgvo = bool(request.form.get("dsgvo"))
-
-        new = {
+        data = {
             "ID": reg_id,
-            "Vorname": vorname,
-            "Nachname": nachname,
-            "Email": email,
-            "Strasse": strasse,
-            "PLZ": plz,
-            "Ort": ort,
-            "Geburtsdatum": geburtsdatum,
-            "Notfallnummer": notfall,
-            "Allergien": allergien,
-            "Unterschrift": unterschrift,
-            "DSGVO": dsgvo,
-            # Admin-Felder initial leer/default
-            "Gender": "",  # "M" oder "W"
-            "days": {"mo": False, "di": False, "mi": False, "do": False, "fr": False},
-            "verses": {"mo": False, "di": False, "mi": False, "do": False, "fr": False},
-            # computed
-            "Age": calc_age(geburtsdatum),
-            "Group": group_for_age(calc_age(geburtsdatum)),
-            "Points": 0
+            "Vorname": request.form.get("Vorname"),
+            "Nachname": request.form.get("Nachname"),
+            "Email": request.form.get("email"),
+            "Strasse": request.form.get("strasse"),
+            "PLZ": request.form.get("plz"),
+            "Ort": request.form.get("ort"),
+            "Geburtsdatum": request.form.get("geburtsdatum"),
+            "Notfallnummer": request.form.get("notfallnummer"),
+            "Allergien": request.form.get("allergien"),
+            "Unterschrift": request.form.get("unterschrift"),
+            "DSGVO": bool(request.form.get("dsgvo"))
         }
-        new["Points"] = compute_points(new)
-        regs.append(new)
-        save_data(regs)
-        return render_template("index.html", success=True, reg_id=reg_id)
+        registrations.append(data)
+        save_data(registrations)
+        return redirect(url_for("success", reg_id=reg_id))
     return render_template("index.html")
 
-# --- Admin Seite: Anzeigen ---
+@app.route("/success")
+def success():
+    reg_id = request.args.get("reg_id")
+    return render_template("success.html", reg_id=reg_id)
+
+# --- Admin-Seite mit Suche ---
 @app.route("/admin")
 def admin():
-    # einfache Passwortabfrage per Query param? (nicht sicher, aber minimal)
     pw = request.args.get("pw")
-    ADMIN_PASSWORD = "MEINADMINPASSWORT"
     if pw != ADMIN_PASSWORD:
-        abort(403)
-    regs = load_data()
-    # Recompute age/group/points for display safety
-    for r in regs:
-        r["Age"] = calc_age(r.get("Geburtsdatum", "")) or r.get("Age")
-        r["Group"] = group_for_age(r.get("Age")) if r.get("Age") is not None else r.get("Group")
-        r["Points"] = compute_points(r)
-    return render_template("admin.html", registrations=regs, pw=pw)
+        return "Zugriff verweigert", 403
 
-# --- Admin: Save (bulk) ---
-@app.route("/admin/save", methods=["POST"])
-def admin_save():
+    registrations = load_data()
+    search_query = request.args.get("search", "").lower()
+    if search_query:
+        registrations = [r for r in registrations if search_query in str(r["ID"]) 
+                         or search_query in r["Vorname"].lower() 
+                         or search_query in r["Nachname"].lower()]
+
+    return render_template("admin.html", registrations=registrations, search_query=search_query)
+
+@app.route("/datenschutz")
+def datenschutz():
+    return render_template("datenschutz.html")
+
+
+# --- Excel Export mit Signaturen ---
+@app.route("/export_excel")
+def export_excel():
     pw = request.args.get("pw")
-    ADMIN_PASSWORD = "MEINADMINPASSWORT"
     if pw != ADMIN_PASSWORD:
-        abort(403)
-    regs = load_data()
-    # Expect many fields like Vorname_<id>, Gender_<id>, day_mo_<id> etc.
-    updated = []
-    id_map = {r["ID"]: r for r in regs}
-    for key, val in request.form.items():
-        # parse
-        # We'll iterate by IDs present in current data
-        pass
+        return "Zugriff verweigert", 403
 
-    # Simpler approach: iterate over existing regs and update from form
-    for r in regs:
-        rid = r["ID"]
-        prefix = f"ID_{rid}_"  # we'll name fields like ID_{rid}_Vorname etc.
-        # If form uses this naming scheme:
-        # Vorname: Vorname_<id> etc. (we accept both)
-        def getf(name):
-            # try name_{id} then ID_{id}_{name}
-            v = request.form.get(f"{name}_{rid}")
-            if v is None:
-                v = request.form.get(f"ID_{rid}_{name}")
-            return v
+    registrations = load_data()
+    if not registrations:
+        return "Keine Daten zum Exportieren", 400
 
-        # Text fields
-        r["Vorname"] = getf("Vorname") or r.get("Vorname","")
-        r["Nachname"] = getf("Nachname") or r.get("Nachname","")
-        r["Email"] = getf("Email") or r.get("Email","")
-        r["Strasse"] = getf("Strasse") or r.get("Strasse","")
-        r["PLZ"] = getf("PLZ") or r.get("PLZ","")
-        r["Ort"] = getf("Ort") or r.get("Ort","")
-        r["Geburtsdatum"] = getf("Geburtsdatum") or r.get("Geburtsdatum","")
-        r["Notfallnummer"] = getf("Notfallnummer") or r.get("Notfallnummer","")
-        r["Allergien"] = getf("Allergien") or r.get("Allergien","")
-        # Gender
-        gender_val = getf("Gender")
-        if gender_val is not None:
-            r["Gender"] = gender_val
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Anmeldungen"
 
-        # Days & Verses: checkboxes; form sends "on" or value for checked boxes
-        days = {}
-        verses = {}
-        for d in ["mo","di","mi","do","fr"]:
-            day_field1 = f"{d}_{rid}"
-            day_field2 = f"ID_{rid}_day_{d}"
-            verses_field1 = f"v_{d}_{rid}"
-            verses_field2 = f"ID_{rid}_verse_{d}"
-            # attendance
-            if request.form.get(day_field1) or request.form.get(day_field2):
-                days[d] = True
+    # Header
+    headers = list(registrations[0].keys())
+    ws.append(headers)
+
+    row_index = 2  # Header ist Zeile 1
+    for r in registrations:
+        col_index = 1
+        for h in headers:
+            if h == "Unterschrift":
+                data_url = r[h]
+                if data_url.startswith("data:image/png;base64,"):
+                    img_data = base64.b64decode(data_url.split(",")[1])
+                    img = XLImage(BytesIO(img_data))
+                    cell = ws.cell(row=row_index, column=col_index)
+                    ws.add_image(img, cell.coordinate)
             else:
-                days[d] = False
-            # verse
-            if request.form.get(verses_field1) or request.form.get(verses_field2):
-                verses[d] = True
-            else:
-                verses[d] = False
-        r["days"] = days
-        r["verses"] = verses
+                ws.cell(row=row_index, column=col_index, value=r[h])
+            col_index += 1
+        row_index += 1
 
-        # recompute age/group/points
-        r["Age"] = calc_age(r.get("Geburtsdatum","")) or r.get("Age")
-        r["Group"] = group_for_age(r.get("Age")) if r.get("Age") is not None else r.get("Group")
-        r["Points"] = compute_points(r)
+    output = "registrations.xlsx"
+    wb.save(output)
+    return send_file(output, as_attachment=True)
 
-    save_data(regs)
-    return redirect(url_for("admin", pw=pw))
-
-# --- Admin: Delete single child ---
-@app.route("/admin/delete/<int:child_id>", methods=["POST"])
-def admin_delete(child_id):
-    pw = request.args.get("pw")
-    ADMIN_PASSWORD = "MEINADMINPASSWORT"
-    if pw != ADMIN_PASSWORD:
-        abort(403)
-    regs = load_data()
-    new_regs = [r for r in regs if r.get("ID") != child_id]
-    if len(new_regs) == len(regs):
-        # not found
-        abort(404)
-    save_data(new_regs)
-    # Note: ID reuse will happen in generate_id() next time someone registers
-    return redirect(url_for("admin", pw=pw))
-
-# --- Run ---
 if __name__ == "__main__":
+    # Lokal testen (nicht für Render)
     app.run(debug=True)
