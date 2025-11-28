@@ -7,70 +7,51 @@
 </head>
 <body>
 
-<div class="container">
-<h1>Admin Bereich</h1>
+<div class="admin-container">
 
-<input type="text" id="search" placeholder="Suchen...">
+<h1>Adminbereich</h1>
+
+<form method="get" class="search-box">
+  <input type="hidden" name="pw" value="MEINADMINPASSWORT">
+  <input type="text" name="q" placeholder="Suchen nach ID, Vorname, Nachname">
+  <button type="submit">🔍 Suchen</button>
+</form>
 
 <table>
 <tr>
-<th>ID</th>
-<th>Vorname</th>
-<th>Nachname</th>
-<th>Alter</th>
-<th>Geschlecht</th>
-<th>Gruppe</th>
-<th>Verse</th>
-<th>Anwesenheit</th>
-<th>Punkte</th>
-<th>Unterschrift</th>
-<th>Aktion</th>
+  <th>ID</th>
+  <th>Vorname</th>
+  <th>Nachname</th>
+  <th>Ort</th>
+  <th>Geburtsdatum</th>
+  <th>Notfall</th>
+  <th>Allergien</th>
+  <th>Unterschrift</th>
+  <th>Löschen</th>
 </tr>
 
-{% for c in registrations %}
-<form method="POST" action="/update/{{ c.ID }}">
+{% for r in registrations %}
 <tr>
-<td>{{ c.ID }}</td>
-<td><input name="Vorname" value="{{ c.Vorname }}"></td>
-<td><input name="Nachname" value="{{ c.Nachname }}"></td>
-<td>{{ c.Alter }}</td>
-
-<td>
-<select name="Geschlecht">
-<option value=""></option>
-<option value="m" {% if c.Geschlecht=="m" %}selected{% endif %}>M</option>
-<option value="w" {% if c.Geschlecht=="w" %}selected{% endif %}>W</option>
-</select>
-</td>
-
-<td>
-<select name="Gruppe">
-<option value=""></option>
-<option value="5-7" {% if c.Gruppe=="5-7" %}selected{% endif %}>5–7</option>
-<option value="8-13" {% if c.Gruppe=="8-13" %}selected{% endif %}>8–13</option>
-</select>
-</td>
-
-<td><input type="number" name="Verse" value="{{ c.Verse }}"></td>
-<td><input type="number" name="Anwesenheit" value="{{ c.Anwesenheit }}"></td>
-<td>{{ c.Punkte }}</td>
-
-<td>
-{% if c.Unterschrift %}
-<img src="{{ c.Unterschrift }}" width="80">
-{% endif %}
-</td>
-
-<td class="actions">
-<button type="submit">💾</button>
-<a href="/delete/{{ c.ID }}" class="delete">🗑</a>
-</td>
+  <td>{{ r.ID }}</td>
+  <td>{{ r.Vorname }}</td>
+  <td>{{ r.Nachname }}</td>
+  <td>{{ r.Ort }}</td>
+  <td>{{ r.Geburtsdatum }}</td>
+  <td>{{ r.Notfallnummer }}</td>
+  <td>{{ r.Allergien }}</td>
+  <td>
+    {% if r.Unterschrift %}
+      <img src="{{ r.Unterschrift }}" height="40">
+    {% endif %}
+  </td>
+  <td>
+    <a class="delete" href="/delete/{{ r.ID }}?pw=MEINADMINPASSWORT">🗑</a>
+  </td>
 </tr>
-</form>
 {% endfor %}
 
 </table>
-</div>
 
+</div>
 </body>
 </html>
