@@ -6,7 +6,6 @@
 <link rel="stylesheet" href="/static/admin.css">
 </head>
 <body>
-
 <div class="admin-container">
 <h1>Adminbereich</h1>
 
@@ -24,9 +23,11 @@
     <th>ID</th>
     <th>Vorname</th>
     <th>Nachname</th>
+    <th>E-Mail</th>
     <th>Ort</th>
     <th>PLZ</th>
     <th>Telefon</th>
+    <th>Geburtsdatum</th>
     <th>Allergien</th>
     <th>Bibelverse</th>
     <th>Mo</th>
@@ -47,9 +48,11 @@
     <td>{{ r.ID }}</td>
     <td><input type="text" name="Vorname" value="{{ r.Vorname }}"></td>
     <td><input type="text" name="Nachname" value="{{ r.Nachname }}"></td>
+    <td>{{ r.Email }}</td>
     <td><input type="text" name="Ort" value="{{ r.Ort }}"></td>
     <td><input type="text" name="PLZ" value="{{ r.PLZ }}"></td>
     <td><input type="text" name="Notfallnummer" value="{{ r.Notfallnummer }}"></td>
+    <td>{{ r.Geburtsdatum }}</td>
     <td>
         <select name="Allergien">
             <option value="">--</option>
@@ -82,7 +85,6 @@
 </form>
 {% endfor %}
 </table>
-
 </div>
 </body>
 </html>

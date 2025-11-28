@@ -7,7 +7,6 @@
 <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-
 <div class="container">
     <img src="/static/icon-kfc.png" class="logo" alt="Ferienclub Logo">
     <h1>Kinder-Ferien-Club Steinen</h1>
@@ -38,8 +37,8 @@
         <label for="notfallnummer">Notfalltelefonnummer<span class="required">*</span></label>
         <input type="tel" id="notfallnummer" name="Notfallnummer" placeholder="z.B. 01234 567890" required>
 
-        <label for="allergien">Allergien<span class="required">*</span></label>
-        <select id="allergien" name="Allergien" required>
+        <label for="allergien">Allergien</label>
+        <select id="allergien" name="Allergien">
             <option value="">-- Bitte wählen --</option>
             <option value="keine">Keine</option>
             <option value="nüsse">Nüsse</option>
@@ -50,20 +49,16 @@
 
         <label>Unterschrift<span class="required">*</span></label>
         <canvas id="signature-pad" width="300" height="100" style="border:1px solid #000;"></canvas>
-        <button type="button" id="reset-btn">Signatur löschen</button>
+        <button type="button" onclick="document.getElementById('signature').value='';">Signatur löschen</button>
         <input type="hidden" id="signature" name="Unterschrift" required>
 
         <div class="checkbox-container">
             <input type="checkbox" id="dsgvo" name="DSGVO" required>
-            <label for="dsgvo">
-                Ich stimme der <a href="/datenschutz" target="_blank">Datenschutzerklärung</a> zu <span class="required">*</span>
-            </label>
+            <label for="dsgvo">Ich stimme der <a href="/datenschutz" target="_blank">Datenschutzerklärung</a> zu <span class="required">*</span></label>
         </div>
 
         <button type="submit">Jetzt anmelden</button>
     </form>
 </div>
-
-<script src="/static/script.js"></script>
 </body>
 </html>
