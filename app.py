@@ -1,110 +1,81 @@
-from flask import Flask, render_template, request, redirect, url_for, abort
-import json, os
-from datetime import datetime
+from flask import Flask, render_template, request, redirect, send_file
+import openpyxl
+from io import BytesIO
 
 app = Flask(__name__)
 
-DATA_FILE = "registrations.json"
-ADMIN_PASSWORD = "MEINADMINPASSWORT"
+# Beispiel-Datenstruktur
+class Registration:
+    def __init__(self, ID, Vorname, Nachname, Geburtsdatum, Alter, Geschlecht, Gruppe, Verse, Anwesenheit, Punkte, Unterschrift):
+        self.ID = ID
+        self.Vorname = Vorname
+        self.Nachname = Nachname
+        self.Geburtsdatum = Geburtsdatum
+        self.Alter = Alter
+        self.Geschlecht = Geschlecht
+        self.Gruppe = Gruppe
+        self.Verse = Verse  # Liste von 5 bools
+        self.Anwesenheit = Anwesenheit  # Liste von 5 bools
+        self.Punkte = Punkte
+        self.Unterschrift = Unterschrift
 
-# -----------------------------
-# JSON Laden / Speichern
-# -----------------------------
-def load_data():
-    if not os.path.exists(DATA_FILE):
-        return []
-    with open(DATA_FILE, "r", encoding="utf-8") as f:
-        return json.load(f)
+# Beispielregistrierungen
+registrations = [
+    Registration(1,"Max","Muster","2010-05-12",13,"m","8-13",[1,0,1,1,0],[1,1,1,0,1],5,"/static/sign1.png"),
+    Registration(2,"Anna","Beispiel","2015-03-22",8,"w","5-7",[1,1,1,0,0],[1,0,1,1,1],7,"/static/sign2.png")
+]
 
-def save_data(data):
-    with open(DATA_FILE, "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=4, ensure_ascii=False)
-
-def generate_id():
-    data = load_data()
-    used_ids = [d["ID"] for d in data]
-    i = 1
-    while i in used_ids:
-        i += 1
-    return i
-
-# -----------------------------
-# INDEX / ANMELDUNG
-# -----------------------------
-@app.route("/", methods=["GET", "POST"])
-def index():
-    if request.method == "POST":
-        data = load_data()
-        new_id = generate_id()
-
-        entry = {
-            "ID": new_id,
-            "Vorname": request.form.get("Vorname"),
-            "Nachname": request.form.get("Nachname"),
-            "Email": request.form.get("email"),
-            "Strasse": request.form.get("strasse"),
-            "PLZ": request.form.get("plz"),
-            "Ort": request.form.get("ort"),
-            "Geburtsdatum": request.form.get("geburtsdatum"),
-            "Notfallnummer": request.form.get("notfallnummer"),
-            "Allergien": request.form.get("allergien"),
-            "Unterschrift": request.form.get("unterschrift"),
-            "DSGVO": True,
-            "Zeitstempel": datetime.now().isoformat()
-        }
-
-        data.append(entry)
-        save_data(data)
-
-        return redirect(url_for("success", reg_id=new_id))
-
-    return render_template("index.html")
-
-# -----------------------------
-# SUCCESS SEITE (MIT GROSSER ID)
-# -----------------------------
-@app.route("/success")
-def success():
-    reg_id = request.args.get("reg_id")
-    return render_template("success.html", reg_id=reg_id)
-
-# -----------------------------
-# ADMIN SEITE MIT SUCHE
-# -----------------------------
-@app.route("/admin")
+@app.route("/")
 def admin():
+    return render_template("admin.html", registrations=registrations)
+
+@app.route("/update/<int:id>", methods=["POST"])
+def update(id):
+    for r in registrations:
+        if r.ID == id:
+            r.Vorname = request.form.get("Vorname")
+            r.Nachname = request.form.get("Nachname")
+            r.Geburtsdatum = request.form.get("Geburtsdatum")
+            r.Geschlecht = request.form.get("Geschlecht")
+            # Verse & Anwesenheit Checkboxen
+            r.Verse = [int(bool(request.form.get(f"Verse{i}"))) for i in range(1,6)]
+            r.Anwesenheit = [int(bool(request.form.get(f"Tag{i}"))) for i in range(1,6)]
+            # Punkte = Summe
+            r.Punkte = sum(r.Verse)+sum(r.Anwesenheit)
+            # Alter automatisch
+            from datetime import date, datetime
+            if r.Geburtsdatum:
+                bd = datetime.strptime(r.Geburtsdatum, "%Y-%m-%d").date()
+                today = date.today()
+                r.Alter = today.year - bd.year - ((today.month, today.day) < (bd.month, bd.day))
+                # Gruppe automatisch
+                if 5 <= r.Alter <= 7: r.Gruppe = "5-7"
+                elif 8 <= r.Alter <= 13: r.Gruppe = "8-13"
+    return redirect("/")
+
+@app.route("/delete/<int:id>")
+def delete(id):
     pw = request.args.get("pw")
-    if pw != ADMIN_PASSWORD:
-        abort(403)
+    if pw != "MEINADMINPASSWORT":
+        return "Falsches Passwort", 403
+    global registrations
+    registrations = [r for r in registrations if r.ID != id]
+    return redirect("/")
 
-    query = request.args.get("q", "").lower()
-    data = load_data()
+@app.route("/export")
+def export():
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Registrierungen"
+    ws.append(["ID","Vorname","Nachname","Geburtsdatum","Alter","Geschlecht","Gruppe","Verse","Anwesenheit","Punkte"])
+    for r in registrations:
+        verse_str = ",".join([str(v) for v in r.Verse])
+        anwesenheit_str = ",".join([str(a) for a in r.Anwesenheit])
+        ws.append([r.ID,r.Vorname,r.Nachname,r.Geburtsdatum,r.Alter,r.Geschlecht,r.Gruppe,verse_str,anwesenheit_str,r.Punkte])
+    output = BytesIO()
+    wb.save(output)
+    output.seek(0)
+    return send_file(output, download_name="registrierungen.xlsx", as_attachment=True)
 
-    if query:
-        data = [
-            d for d in data
-            if query in str(d["ID"]).lower()
-            or query in d["Vorname"].lower()
-            or query in d["Nachname"].lower()
-        ]
-
-    return render_template("admin.html", registrations=data)
-
-# -----------------------------
-# KIND LÖSCHEN
-# -----------------------------
-@app.route("/delete/<int:child_id>")
-def delete(child_id):
-    pw = request.args.get("pw")
-    if pw != ADMIN_PASSWORD:
-        abort(403)
-
-    data = load_data()
-    data = [d for d in data if d["ID"] != child_id]
-    save_data(data)
-
-    return redirect(f"/admin?pw={ADMIN_PASSWORD}")
-
-# -----------------------------
 if __name__ == "__main__":
     app.run(debug=True)
