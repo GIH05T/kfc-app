@@ -7,109 +7,96 @@
 </head>
 <body>
 <div class="admin-container">
-    <h1>Adminbereich</h1>
+<h1>Adminbereich</h1>
 
-    <!-- Suche -->
-    <form method="get" class="search-box" style="display:inline-block; margin-right:10px;">
-        <input type="hidden" name="pw" value="{{ pw }}">
-        <input type="text" name="search" placeholder="Suchen nach ID, Vorname, Nachname" value="{{ search_query }}">
-        <button type="submit">🔍 Suchen</button>
-    </form>
+<form method="get" class="search-box">
+<input type="hidden" name="pw" value="{{ pw }}">
+<input type="text" name="search" placeholder="Suchen nach ID, Vorname, Nachname" value="{{ search_query }}">
+<button type="submit">🔍 Suchen</button>
+</form>
 
-    <!-- Excel Export -->
-    <a href="/export_excel?pw={{ pw }}" style="display:inline-block;">📥 Excel Export</a>
+<a href="/export_excel?pw={{ pw }}">📥 Excel Export</a>
 
-    <table border="1" style="margin-top:15px; width:100%; border-collapse: collapse;">
-        <tr>
-            <th>ID</th>
-            <th>Geschlecht</th>
-            <th>Vorname</th>
-            <th>Nachname</th>
-            <th>Straße</th>
-            <th>PLZ</th>
-            <th>Ort</th>
-            <th>Telefon</th>
-            <th>Allergien</th>
-            <th>Anmeldung</th>
-            <th>Punkte</th>
-            <th>Alter</th>
-            <th>Gruppe</th>
-            <th>Unterschrift</th>
-            <th>Aktion</th>
-        </tr>
+<table border="1">
+<tr>
+    <th>ID</th>
+    <th>Geschlecht</th>
+    <th>Vorname</th>
+    <th>Nachname</th>
+    <th>Straße</th>
+    <th>PLZ</th>
+    <th>Ort</th>
+    <th>Telefon</th>
+    <th>E-Mail</th>
+    <th>Allergien</th>
+    <th>Anmeldung</th>
+    <th>Punkte</th>
+    <th>Alter</th>
+    <th>Gruppe</th>
+    <th>Unterschrift</th>
+    <th>Aktion</th>
+</tr>
 
-        {% for r in registrations %}
-        <form method="POST" action="/update/{{ r.ID }}">
-        <tr>
-            <td>{{ r.ID }}</td>
+{% for r in registrations %}
+<form method="POST" action="/update/{{ r.ID }}?pw={{ pw }}">
+<tr>
+    <td>{{ r.ID }}</td>
+    <td>
+        <select name="Geschlecht">
+            <option value="m" {% if r.Geschlecht=='m' %}selected{% endif %}>m</option>
+            <option value="w" {% if r.Geschlecht=='w' %}selected{% endif %}>w</option>
+        </select>
+    </td>
+    <td><input type="text" name="Vorname" value="{{ r.Vorname }}"></td>
+    <td><input type="text" name="Nachname" value="{{ r.Nachname }}"></td>
+    <td><input type="text" name="Strasse" value="{{ r.Strasse }}"></td>
+    <td><input type="text" name="PLZ" value="{{ r.PLZ }}"></td>
+    <td><input type="text" name="Ort" value="{{ r.Ort }}"></td>
+    <td><input type="text" name="Notfallnummer" value="{{ r.Notfallnummer }}"></td>
+    <td><input type="text" name="Email" value="{{ r.Email }}"></td>
+    <td>
+        <select name="Allergien">
+            <option value="">--</option>
+            <option value="keine" {% if r.Allergien=='keine' %}selected{% endif %}>Keine</option>
+            <option value="nüsse" {% if r.Allergien=='nüsse' %}selected{% endif %}>Nüsse</option>
+            <option value="laktose" {% if r.Allergien=='laktose' %}selected{% endif %}>Laktose</option>
+            <option value="ei" {% if r.Allergien=='ei' %}selected{% endif %}>Ei</option>
+            <option value="gluten" {% if r.Allergien=='gluten' %}selected{% endif %}>Gluten</option>
+        </select>
+    </td>
 
-            <!-- Geschlecht -->
-            <td>
-                <select name="Geschlecht">
-                    <option value="m" {% if r.Geschlecht=='m' %}selected{% endif %}>m</option>
-                    <option value="w" {% if r.Geschlecht=='w' %}selected{% endif %}>w</option>
-                </select>
-            </td>
+    <!-- Anmeldung: Tage oben, Bibelverse unten -->
+    <td>
+        <div style="display:flex; flex-direction:column;">
+            <div style="display:flex; justify-content:space-between;">
+                {% for i in range(1,6) %}
+                <input type="checkbox" name="Tag{{ i }}" {% if r['Tag'+i|string] %}checked{% endif %}>
+                {% endfor %}
+            </div>
+            <div style="display:flex; justify-content:space-between; margin-top:4px;">
+                {% for i in range(1,6) %}
+                <input type="checkbox" name="Verse{{ i }}" {% if r['Verse'+i|string] %}checked{% endif %}>
+                {% endfor %}
+            </div>
+        </div>
+    </td>
 
-            <!-- Name -->
-            <td><input type="text" name="Vorname" value="{{ r.Vorname }}"></td>
-            <td><input type="text" name="Nachname" value="{{ r.Nachname }}"></td>
-
-            <!-- Adresse -->
-            <td><input type="text" name="Strasse" value="{{ r.Strasse }}"></td>
-            <td><input type="text" name="PLZ" value="{{ r.PLZ }}"></td>
-            <td><input type="text" name="Ort" value="{{ r.Ort }}"></td>
-
-            <!-- Telefon & Allergien -->
-            <td><input type="text" name="Notfallnummer" value="{{ r.Notfallnummer }}"></td>
-            <td>
-                <select name="Allergien">
-                    <option value="">--</option>
-                    <option value="keine" {% if r.Allergien=='keine' %}selected{% endif %}>Keine</option>
-                    <option value="nüsse" {% if r.Allergien=='nüsse' %}selected{% endif %}>Nüsse</option>
-                    <option value="laktose" {% if r.Allergien=='laktose' %}selected{% endif %}>Laktose</option>
-                    <option value="ei" {% if r.Allergien=='ei' %}selected{% endif %}>Ei</option>
-                    <option value="gluten" {% if r.Allergien=='gluten' %}selected{% endif %}>Gluten</option>
-                </select>
-            </td>
-
-            <!-- Anmeldung: Tage + Bibelverse -->
-            <td>
-                <div style="display:flex; flex-direction:column; gap:4px;">
-                    <!-- obere Reihe: Tage -->
-                    <div style="display:flex; justify-content:space-between;">
-                        {% for i in range(5) %}
-                        <input type="checkbox" name="Tag{{ i+1 }}" {% if r['Tag'+i|string] %}checked{% endif %}>
-                        {% endfor %}
-                    </div>
-                    <!-- untere Reihe: Bibelverse -->
-                    <div style="display:flex; justify-content:space-between;">
-                        {% for i in range(5) %}
-                        <input type="checkbox" name="Verse{{ i+1 }}" {% if r['Verse'+i|string] %}checked{% endif %}>
-                        {% endfor %}
-                    </div>
-                </div>
-            </td>
-
-            <!-- Punkte, Alter, Gruppe, Unterschrift -->
-            <td>{{ r.Punkte }}</td>
-            <td>{{ r.Alter }}</td>
-            <td><input type="text" name="Gruppe" value="{{ r.Gruppe }}"></td>
-            <td>
-                {% if r.Unterschrift %}
-                    <img src="{{ r.Unterschrift }}" width="80">
-                {% endif %}
-            </td>
-
-            <!-- Aktion -->
-            <td>
-                <button type="submit">💾</button>
-                <a href="/delete/{{ r.ID }}?pw={{ pw }}">🗑</a>
-            </td>
-        </tr>
-        </form>
-        {% endfor %}
-    </table>
+    <td>{{ r.Punkte }}</td>
+    <td>{{ r.Alter }}</td>
+    <td>{{ r.Gruppe }}</td>
+    <td>
+        {% if r.Unterschrift %}
+            <img src="{{ r.Unterschrift }}" width="80">
+        {% endif %}
+    </td>
+    <td>
+        <button type="submit">💾</button>
+        <a href="/delete/{{ r.ID }}?pw={{ pw }}">🗑</a>
+    </td>
+</tr>
+</form>
+{% endfor %}
+</table>
 </div>
 </body>
 </html>
