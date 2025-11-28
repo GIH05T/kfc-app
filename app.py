@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, send_file
+from flask import Flask, render_template, request, redirect, send_file, url_for
 import json, os
 from openpyxl import Workbook
 from openpyxl.drawing.image import Image as XLImage
@@ -75,12 +75,15 @@ def index():
 
         registrations.append(data)
         save_data(registrations)
-        return redirect(f"/success?reg_id={reg_id}")
+        return redirect(url_for("success", reg_id=reg_id))
     return render_template("index.html")
 
+# --- Erfolgsseite nach Anmeldung ---
 @app.route("/success")
 def success():
     reg_id = request.args.get("reg_id")
+    if not reg_id:
+        return redirect(url_for("index"))
     return render_template("success.html", reg_id=reg_id)
 
 # --- Admin Seite ---
@@ -160,7 +163,7 @@ def export_excel():
         for h in headers:
             if h == "Unterschrift":
                 data_url = r[h]
-                if data_url.startswith("data:image/png;base64,"):
+                if data_url and data_url.startswith("data:image/png;base64,"):
                     img_data = base64.b64decode(data_url.split(",")[1])
                     img = XLImage(BytesIO(img_data))
                     cell = ws.cell(row=row_index, column=col_index)
