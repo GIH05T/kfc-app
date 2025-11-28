@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, send_file
 import openpyxl
 from io import BytesIO
+from datetime import date, datetime
 
 app = Flask(__name__)
 
@@ -25,10 +26,17 @@ registrations = [
     Registration(2,"Anna","Beispiel","2015-03-22",8,"w","5-7",[1,1,1,0,0],[1,0,1,1,1],7,"/static/sign2.png")
 ]
 
-@app.route("/")
+ADMIN_PASSWORD = "MEINADMINPASSWORT"
+
+# ---------------- Admin-Seite ----------------
+@app.route("/admin")
 def admin():
+    pw = request.args.get("pw")
+    if pw != ADMIN_PASSWORD:
+        return "Falsches Passwort", 403
     return render_template("admin.html", registrations=registrations)
 
+# ---------------- Update einer Zeile ----------------
 @app.route("/update/<int:id>", methods=["POST"])
 def update(id):
     for r in registrations:
@@ -37,31 +45,32 @@ def update(id):
             r.Nachname = request.form.get("Nachname")
             r.Geburtsdatum = request.form.get("Geburtsdatum")
             r.Geschlecht = request.form.get("Geschlecht")
-            # Verse & Anwesenheit Checkboxen
             r.Verse = [int(bool(request.form.get(f"Verse{i}"))) for i in range(1,6)]
             r.Anwesenheit = [int(bool(request.form.get(f"Tag{i}"))) for i in range(1,6)]
-            # Punkte = Summe
             r.Punkte = sum(r.Verse)+sum(r.Anwesenheit)
-            # Alter automatisch
-            from datetime import date, datetime
+            # Alter berechnen
             if r.Geburtsdatum:
                 bd = datetime.strptime(r.Geburtsdatum, "%Y-%m-%d").date()
                 today = date.today()
                 r.Alter = today.year - bd.year - ((today.month, today.day) < (bd.month, bd.day))
                 # Gruppe automatisch
-                if 5 <= r.Alter <= 7: r.Gruppe = "5-7"
-                elif 8 <= r.Alter <= 13: r.Gruppe = "8-13"
-    return redirect("/")
+                if 5 <= r.Alter <= 7:
+                    r.Gruppe = "5-7"
+                elif 8 <= r.Alter <= 13:
+                    r.Gruppe = "8-13"
+    return redirect(f"/admin?pw={ADMIN_PASSWORD}")
 
+# ---------------- Löschen ----------------
 @app.route("/delete/<int:id>")
 def delete(id):
     pw = request.args.get("pw")
-    if pw != "MEINADMINPASSWORT":
+    if pw != ADMIN_PASSWORD:
         return "Falsches Passwort", 403
     global registrations
     registrations = [r for r in registrations if r.ID != id]
-    return redirect("/")
+    return redirect(f"/admin?pw={ADMIN_PASSWORD}")
 
+# ---------------- Excel-Export ----------------
 @app.route("/export")
 def export():
     wb = openpyxl.Workbook()
@@ -77,5 +86,6 @@ def export():
     output.seek(0)
     return send_file(output, download_name="registrierungen.xlsx", as_attachment=True)
 
+# ---------------- App starten ----------------
 if __name__ == "__main__":
     app.run(debug=True)
