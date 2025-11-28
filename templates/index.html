@@ -65,17 +65,40 @@
 // --- Signatur Pad ---
 const canvas = document.getElementById("signature-pad");
 const ctx = canvas.getContext("2d");
+
+// Canvas auf tatsächliche CSS-Größe skalieren
+function resizeCanvas() {
+    const style = getComputedStyle(canvas);
+    canvas.width = parseInt(style.width);
+    canvas.height = parseInt(style.height);
+    ctx.lineWidth = 2;
+    ctx.lineCap = "round";
+    ctx.strokeStyle = "#000";
+}
+resizeCanvas();
+window.addEventListener("resize", resizeCanvas);
+
 let drawing = false;
 let lastX = 0;
 let lastY = 0;
 
+// Maus Events
 canvas.addEventListener("mousedown", (e) => {
     drawing = true;
     [lastX, lastY] = [e.offsetX, e.offsetY];
 });
-canvas.addEventListener("mousemove", draw);
+canvas.addEventListener("mousemove", drawMouse);
 canvas.addEventListener("mouseup", () => { drawing = false; saveSignature(); });
 canvas.addEventListener("mouseout", () => { drawing = false; saveSignature(); });
+
+function drawMouse(e) {
+    if (!drawing) return;
+    ctx.beginPath();
+    ctx.moveTo(lastX, lastY);
+    ctx.lineTo(e.offsetX, e.offsetY);
+    ctx.stroke();
+    [lastX, lastY] = [e.offsetX, e.offsetY];
+}
 
 // Touch Events
 canvas.addEventListener("touchstart", (e) => {
@@ -97,16 +120,7 @@ canvas.addEventListener("touchmove", (e) => {
     ctx.stroke();
     [lastX, lastY] = [x, y];
 });
-canvas.addEventListener("touchend", (e) => { drawing = false; saveSignature(); });
-
-function draw(e) {
-    if (!drawing) return;
-    ctx.beginPath();
-    ctx.moveTo(lastX, lastY);
-    ctx.lineTo(e.offsetX, e.offsetY);
-    ctx.stroke();
-    [lastX, lastY] = [e.offsetX, e.offsetY];
-}
+canvas.addEventListener("touchend", () => { drawing = false; saveSignature(); });
 
 function saveSignature() {
     document.getElementById("signature").value = canvas.toDataURL("image/png");
@@ -118,6 +132,7 @@ document.getElementById("reset-btn").addEventListener("click", () => {
     document.getElementById("signature").value = "";
 });
 </script>
+
 
 </body>
 </html>
