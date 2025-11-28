@@ -49,8 +49,7 @@
         </select>
 
         <label>Unterschrift<span class="required">*</span></label>
-        <canvas id="signature-pad" required></canvas>
-        <button type="button" id="reset-btn" class="reset-btn">Signatur löschen</button>
+        <input type="text" name="Unterschrift" placeholder="Signatur eingeben" required>
 
         <div class="checkbox-container">
             <input type="checkbox" id="dsgvo" name="DSGVO" required>
@@ -59,11 +58,9 @@
             </label>
         </div>
 
-        <input type="hidden" id="signature" name="Unterschrift">
         <button type="submit">Jetzt anmelden</button>
     </form>
 </div>
 
-<script src="/static/script.js"></script>
 </body>
 </html>
