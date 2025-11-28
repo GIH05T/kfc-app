@@ -8,119 +8,81 @@
 <body>
 
 <div class="admin-container">
-
 <h1>Adminbereich</h1>
 
-<!-- Suchleiste + Export Button -->
-<form method="get" class="search-box">
-    <input type="hidden" name="pw" value="MEINADMINPASSWORT">
-    <input type="text" id="search" name="q" placeholder="Suchen nach ID, Vorname, Nachname">
-    <button type="submit">🔍 Suchen</button>
-    <button type="get" formaction="/export" class="export-btn">Export Excel</button>
-</form>
+<div class="admin-controls">
+    <form method="get" class="search-box">
+        <input type="hidden" name="pw" value="{{ pw }}">
+        <input type="text" name="search" placeholder="Suchen nach ID, Vorname, Nachname" value="{{ search_query }}">
+        <button type="submit">🔍 Suchen</button>
+    </form>
+    <a href="/export_excel?pw={{ pw }}" class="export-btn">📥 Excel Export</a>
+</div>
 
 <table>
 <tr>
     <th>ID</th>
     <th>Vorname</th>
     <th>Nachname</th>
-    <th>Geburtsdatum</th>
-    <th>Alter</th>
-    <th>Geschlecht</th>
-    <th>Gruppe</th>
-    <th>Verse</th>
-    <th>Anwesenheit</th>
+    <th>Ort</th>
+    <th>PLZ</th>
+    <th>Telefon</th>
+    <th>Allergien</th>
+    <th>Bibelverse</th>
+    <th>Mo</th>
+    <th>Di</th>
+    <th>Mi</th>
+    <th>Do</th>
+    <th>Fr</th>
     <th>Punkte</th>
+    <th>Alter</th>
+    <th>Gruppe</th>
     <th>Unterschrift</th>
     <th>Aktion</th>
 </tr>
 
-{% for c in registrations %}
+{% for r in registrations %}
+<form method="POST" action="/update/{{ r.ID }}">
 <tr>
-<form method="POST" action="/update/{{ c.ID }}">
-    <td>{{ c.ID }}</td>
-    <td><input type="text" name="Vorname" value="{{ c.Vorname }}"></td>
-    <td><input type="text" name="Nachname" value="{{ c.Nachname }}"></td>
-    <td><input type="date" name="Geburtsdatum" value="{{ c.Geburtsdatum }}" onchange="updateAgeAndGroup(this, '{{ c.ID }}')"></td>
-    <td><span id="age-{{ c.ID }}">{{ c.Alter }}</span></td>
+    <td>{{ r.ID }}</td>
+    <td><input type="text" name="Vorname" value="{{ r.Vorname }}"></td>
+    <td><input type="text" name="Nachname" value="{{ r.Nachname }}"></td>
+    <td><input type="text" name="Ort" value="{{ r.Ort }}"></td>
+    <td><input type="text" name="PLZ" value="{{ r.PLZ }}"></td>
+    <td><input type="text" name="Notfallnummer" value="{{ r.Notfallnummer }}"></td>
     <td>
-        <select name="Geschlecht">
-            <option value=""></option>
-            <option value="m" {% if c.Geschlecht=="m" %}selected{% endif %}>M</option>
-            <option value="w" {% if c.Geschlecht=="w" %}selected{% endif %}>W</option>
+        <select name="Allergien">
+            <option value="">--</option>
+            <option value="keine" {% if r.Allergien=="keine" %}selected{% endif %}>Keine</option>
+            <option value="nüsse" {% if r.Allergien=="nüsse" %}selected{% endif %}>Nüsse</option>
+            <option value="laktose" {% if r.Allergien=="laktose" %}selected{% endif %}>Laktose</option>
+            <option value="ei" {% if r.Allergien=="ei" %}selected{% endif %}>Ei</option>
+            <option value="gluten" {% if r.Allergien=="gluten" %}selected{% endif %}>Gluten</option>
         </select>
     </td>
-    <td><input type="text" name="Gruppe" id="group-{{ c.ID }}" value="{{ c.Gruppe }}" readonly></td>
-    
-    <!-- 5 Verse Checkboxen -->
-    <td>
-    {% for i in range(1,6) %}
-        <input type="checkbox" name="Verse{{i}}" {% if c.Verse[i-1] %}checked{% endif %}>
+    <td><input type="number" name="Bibelverse" value="{{ r.Bibelverse }}"></td>
+
+    {% for i in range(5) %}
+    <td><input type="checkbox" name="Tag{{ i+1 }}" value="1" {% if r.Anwesenheit[i] %}checked{% endif %}></td>
     {% endfor %}
-    </td>
 
-    <!-- 5 Tage Checkboxen -->
+    <td>{{ r.Punkte }}</td>
+    <td>{{ r.Alter }}</td>
+    <td>{{ r.Gruppe }}</td>
     <td>
-    {% for i in range(1,6) %}
-        <input type="checkbox" name="Tag{{i}}" {% if c.Anwesenheit[i-1] %}checked{% endif %}>
-    {% endfor %}
-    </td>
-
-    <td><span id="punkte-{{ c.ID }}">{{ c.Punkte }}</span></td>
-
-    <td>
-        {% if c.Unterschrift %}
-            <img src="{{ c.Unterschrift }}" height="40">
+        {% if r.Unterschrift %}
+            <img src="{{ r.Unterschrift }}" width="80">
         {% endif %}
     </td>
-
-    <td class="actions">
-        <button type="submit" class="save-btn">💾</button>
-        <a class="delete" href="/delete/{{ c.ID }}?pw=MEINADMINPASSWORT">🗑</a>
+    <td>
+        <button type="submit">💾</button>
+        <a href="/delete/{{ r.ID }}?pw={{ pw }}" class="delete">🗑</a>
     </td>
-</form>
 </tr>
+</form>
 {% endfor %}
-
 </table>
+
 </div>
-
-<script>
-// Alter & Gruppe automatisch berechnen
-function updateAgeAndGroup(input, id) {
-    const birthDate = new Date(input.value);
-    const today = new Date();
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const m = today.getMonth() - birthDate.getMonth();
-    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) age--;
-    document.getElementById('age-' + id).innerText = age;
-
-    let group = '';
-    if (age >= 5 && age <= 7) group = '5-7';
-    else if (age >= 8 && age <= 13) group = '8-13';
-    document.getElementById('group-' + id).value = group;
-
-    updatePoints(id);
-}
-
-// Punkte = Summe Tage + Verse
-function updatePoints(id) {
-    const row = document.getElementById('age-' + id).closest('tr');
-    const checkboxes = row.querySelectorAll('input[type="checkbox"]');
-    let points = 0;
-    checkboxes.forEach(cb => { if(cb.checked) points++; });
-    document.getElementById('punkte-' + id).innerText = points;
-}
-
-// Punkte live bei Checkbox-Klick
-document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
-    cb.addEventListener('change', function() {
-        const row = this.closest('tr');
-        const id = row.querySelector('span[id^="age-"]').id.split('-')[1];
-        updatePoints(id);
-    });
-});
-</script>
-
 </body>
 </html>

@@ -2,87 +2,15 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<title>Admin Bereich</title>
-<link rel="stylesheet" href="/static/admin.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Anmeldung erfolgreich</title>
+<link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-
-<div class="admin-container">
-<h1>Adminbereich</h1>
-
-<div class="admin-controls">
-    <form method="get" class="search-box">
-        <input type="hidden" name="pw" value="{{ pw }}">
-        <input type="text" name="search" placeholder="Suchen nach ID, Vorname, Nachname" value="{{ search_query }}">
-        <button type="submit">🔍 Suchen</button>
-    </form>
-    <a href="/export_excel?pw={{ pw }}" class="export-btn">📥 Excel Export</a>
-</div>
-
-<table>
-<tr>
-    <th>ID</th>
-    <th>Vorname</th>
-    <th>Nachname</th>
-    <th>Ort</th>
-    <th>PLZ</th>
-    <th>Telefon</th>
-    <th>Allergien</th>
-    <th>Bibelverse</th>
-    <th>Mo</th>
-    <th>Di</th>
-    <th>Mi</th>
-    <th>Do</th>
-    <th>Fr</th>
-    <th>Punkte</th>
-    <th>Alter</th>
-    <th>Gruppe</th>
-    <th>Unterschrift</th>
-    <th>Aktion</th>
-</tr>
-
-{% for r in registrations %}
-<form method="POST" action="/update/{{ r.ID }}">
-<tr>
-    <td>{{ r.ID }}</td>
-    <td><input type="text" name="Vorname" value="{{ r.Vorname }}"></td>
-    <td><input type="text" name="Nachname" value="{{ r.Nachname }}"></td>
-    <td><input type="text" name="Ort" value="{{ r.Ort }}"></td>
-    <td><input type="text" name="PLZ" value="{{ r.PLZ }}"></td>
-    <td><input type="text" name="Notfallnummer" value="{{ r.Notfallnummer }}"></td>
-    <td>
-        <select name="Allergien">
-            <option value="">--</option>
-            <option value="keine" {% if r.Allergien=="keine" %}selected{% endif %}>Keine</option>
-            <option value="nüsse" {% if r.Allergien=="nüsse" %}selected{% endif %}>Nüsse</option>
-            <option value="laktose" {% if r.Allergien=="laktose" %}selected{% endif %}>Laktose</option>
-            <option value="ei" {% if r.Allergien=="ei" %}selected{% endif %}>Ei</option>
-            <option value="gluten" {% if r.Allergien=="gluten" %}selected{% endif %}>Gluten</option>
-        </select>
-    </td>
-    <td><input type="number" name="Bibelverse" value="{{ r.Bibelverse }}"></td>
-
-    {% for i in range(5) %}
-    <td><input type="checkbox" name="Tag{{ i+1 }}" value="1" {% if r.Anwesenheit[i] %}checked{% endif %}></td>
-    {% endfor %}
-
-    <td>{{ r.Punkte }}</td>
-    <td>{{ r.Alter }}</td>
-    <td>{{ r.Gruppe }}</td>
-    <td>
-        {% if r.Unterschrift %}
-            <img src="{{ r.Unterschrift }}" width="80">
-        {% endif %}
-    </td>
-    <td>
-        <button type="submit">💾</button>
-        <a href="/delete/{{ r.ID }}?pw={{ pw }}" class="delete">🗑</a>
-    </td>
-</tr>
-</form>
-{% endfor %}
-</table>
-
+<div class="container">
+    <h1>Vielen Dank für deine Anmeldung!</h1>
+    <p>Deine Registrierungs-ID: <strong>{{ reg_id }}</strong></p>
+    <a href="/">Zurück zur Anmeldung</a>
 </div>
 </body>
 </html>
