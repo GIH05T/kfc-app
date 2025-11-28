@@ -131,6 +131,35 @@ document.getElementById("reset-btn").addEventListener("click", () => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     document.getElementById("signature").value = "";
 });
+
+const submitBtn = document.getElementById("submit-btn");
+
+function checkForm() {
+    const requiredFields = document.querySelectorAll(
+        "#Vorname, #Nachname, #strasse, #plz, #ort, #geburtsdatum, #notfallnummer"
+    );
+
+    let allFilled = true;
+    requiredFields.forEach(field => {
+        if (!field.value.trim()) allFilled = false;
+    });
+
+    const dsgvo = document.getElementById("dsgvo").checked;
+    const signatureFilled = document.getElementById("signature").value.trim() !== "";
+
+    if (allFilled && dsgvo && signatureFilled) {
+        submitBtn.disabled = false;
+        submitBtn.style.background = "#7ccc00";  // ✅ gleiches Grün wie "Online Anmeldung"
+    } else {
+        submitBtn.disabled = true;
+        submitBtn.style.background = "#aaa";     // grau
+    }
+}
+
+// Auf ALLE Änderungen reagieren
+document.addEventListener("input", checkForm);
+document.getElementById("dsgvo").addEventListener("change", checkForm);
+document.getElementById("reset-btn").addEventListener("click", checkForm);
 </script>
 
 

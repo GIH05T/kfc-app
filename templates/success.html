@@ -2,16 +2,49 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Anmeldung erfolgreich</title>
 <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-<div class="container">
-    <h1>Vielen Dank für deine Anmeldung!</h1>
-    <p>Deine Registrierungs-ID:</p>
-    <h2 style="font-size: 4em; color: red;">{{ reg_id }}</h2>
-    <a href="/">Zurück zur Anmeldung</a>
+
+<div class="container" style="text-align:center;">
+    <img src="/static/icon-kfc.png" class="logo">
+
+    <h1>Herzlich Willkommen beim KFC!</h1>
+
+    <p style="font-size: 1.3em; margin-top: 15px;">
+        Wir freuen uns, dich vom  
+        <strong>07.09 – 11.09.2026</strong>  
+        bei uns zu sehen! 🎉
+    </p>
+
+    <p style="margin-top: 25px; font-size: 1.2em;">
+        Du bist Kind Nr.
+    </p>
+
+    <div style="
+        margin: 20px auto;
+        font-size: 4em;
+        font-weight: bold;
+        color: #7ccc00;
+    ">
+        {{ reg_id }}
+    </div>
+
+    <p>Bitte merke dir diese Nummer gut.</p>
+
+    <a href="/" style="
+        display:inline-block;
+        margin-top: 25px;
+        padding: 10px 20px;
+        background:#0060b8;
+        color:white;
+        text-decoration:none;
+        border-radius:6px;
+    ">
+        Neue Anmeldung
+    </a>
 </div>
+
 </body>
 </html>
