@@ -15,7 +15,7 @@
 <button type="submit">🔍 Suchen</button>
 </form>
 
-<a href="/export_excel?pw={{ pw }}" class="export-btn">📥 Excel Export</a>
+<a href="/export_excel?pw={{ pw }}">📥 Excel Export</a>
 
 <table border="1">
 <tr>
@@ -26,7 +26,6 @@
     <th>Straße</th>
     <th>PLZ</th>
     <th>Ort</th>
-    <th>Geburtsdatum</th>
     <th>Telefon</th>
     <th>E-Mail</th>
     <th>Allergien</th>
@@ -39,8 +38,8 @@
 </tr>
 
 {% for r in registrations %}
+<form method="POST" action="/update/{{ r.ID }}?pw={{ pw }}">
 <tr>
-    <form method="POST" action="/update/{{ r.ID }}">
     <td>{{ r.ID }}</td>
     <td>
         <select name="Geschlecht">
@@ -53,9 +52,8 @@
     <td><input type="text" name="Strasse" value="{{ r.Strasse }}"></td>
     <td><input type="text" name="PLZ" value="{{ r.PLZ }}"></td>
     <td><input type="text" name="Ort" value="{{ r.Ort }}"></td>
-    <td><input type="date" name="Geburtsdatum" value="{{ r.Geburtsdatum }}"></td>
     <td><input type="text" name="Notfallnummer" value="{{ r.Notfallnummer }}"></td>
-    <td><input type="email" name="Email" value="{{ r.Email }}"></td>
+    <td><input type="text" name="Email" value="{{ r.Email }}"></td>
     <td>
         <select name="Allergien">
             <option value="">--</option>
@@ -67,19 +65,17 @@
         </select>
     </td>
 
-    <!-- Anmeldung Kästchen: Tage oben, Bibelverse unten, in einer Spalte -->
+    <!-- Anmeldung: Tage oben, Bibelverse unten -->
     <td>
         <div style="display:flex; flex-direction:column;">
-            <div style="display:flex; justify-content:space-between; font-weight:bold; margin-bottom:2px;">Tag(e)</div>
             <div style="display:flex; justify-content:space-between;">
-                {% for i in range(5) %}
-                <input type="checkbox" name="Tag{{ i+1 }}" {% if r['Tag'+i|string] %}checked{% endif %}>
+                {% for i in range(1,6) %}
+                <input type="checkbox" name="Tag{{ i }}" {% if r['Tag'+i|string] %}checked{% endif %}>
                 {% endfor %}
             </div>
-            <div style="display:flex; justify-content:space-between; font-weight:bold; margin-top:4px;">Verse</div>
-            <div style="display:flex; justify-content:space-between;">
-                {% for i in range(5) %}
-                <input type="checkbox" name="Verse{{ i+1 }}" {% if r['Verse'+i|string] %}checked{% endif %}>
+            <div style="display:flex; justify-content:space-between; margin-top:4px;">
+                {% for i in range(1,6) %}
+                <input type="checkbox" name="Verse{{ i }}" {% if r['Verse'+i|string] %}checked{% endif %}>
                 {% endfor %}
             </div>
         </div>
@@ -87,15 +83,7 @@
 
     <td>{{ r.Punkte }}</td>
     <td>{{ r.Alter }}</td>
-    <td>
-        {% if r.Alter >=5 and r.Alter <=7 %}
-            5-7
-        {% elif r.Alter >=8 and r.Alter <=13 %}
-            8-13
-        {% else %}
-            --
-        {% endif %}
-    </td>
+    <td>{{ r.Gruppe }}</td>
     <td>
         {% if r.Unterschrift %}
             <img src="{{ r.Unterschrift }}" width="80">
@@ -105,11 +93,10 @@
         <button type="submit">💾</button>
         <a href="/delete/{{ r.ID }}?pw={{ pw }}">🗑</a>
     </td>
-    </form>
 </tr>
+</form>
 {% endfor %}
 </table>
-
 </div>
 </body>
 </html>
