@@ -13,6 +13,14 @@
     <h2>Online-Anmeldung 2026</h2>
 
     <form id="registration-form" action="/" method="POST">
+	
+		<label for="geschlecht">Geschlecht<span class="required">*</span></label>
+		<select id="geschlecht" name="Geschlecht" required>
+			<option value="">-- Bitte wählen --</option>
+			<option value="m">männlich</option>
+			<option value="w">weiblich</option>
+		</select>
+		
         <label for="Vorname">Vorname<span class="required">*</span></label>
         <input type="text" id="Vorname" name="Vorname" placeholder="Max" required>
 
