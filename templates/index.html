@@ -48,8 +48,8 @@
         </select>
 
         <label>Unterschrift<span class="required">*</span></label>
-        <canvas id="signature-pad" width="300" height="100" style="border:1px solid #000;"></canvas>
-        <button type="button" onclick="document.getElementById('signature').value='';">Signatur löschen</button>
+        <canvas id="signature-pad"></canvas>
+        <button type="button" class="reset-btn" onclick="document.getElementById('signature').value='';">Signatur löschen</button>
         <input type="hidden" id="signature" name="Unterschrift" required>
 
         <div class="checkbox-container">
