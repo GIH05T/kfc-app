@@ -49,7 +49,7 @@
 
         <label>Unterschrift<span class="required">*</span></label>
         <canvas id="signature-pad"></canvas>
-        <button type="button" class="reset-btn" onclick="document.getElementById('signature').value='';">Signatur löschen</button>
+        <button type="button" class="reset-btn" id="reset-btn">Signatur löschen</button>
         <input type="hidden" id="signature" name="Unterschrift" required>
 
         <div class="checkbox-container">
@@ -60,5 +60,64 @@
         <button type="submit">Jetzt anmelden</button>
     </form>
 </div>
+
+<script>
+// --- Signatur Pad ---
+const canvas = document.getElementById("signature-pad");
+const ctx = canvas.getContext("2d");
+let drawing = false;
+let lastX = 0;
+let lastY = 0;
+
+canvas.addEventListener("mousedown", (e) => {
+    drawing = true;
+    [lastX, lastY] = [e.offsetX, e.offsetY];
+});
+canvas.addEventListener("mousemove", draw);
+canvas.addEventListener("mouseup", () => { drawing = false; saveSignature(); });
+canvas.addEventListener("mouseout", () => { drawing = false; saveSignature(); });
+
+// Touch Events
+canvas.addEventListener("touchstart", (e) => {
+    e.preventDefault();
+    drawing = true;
+    const rect = canvas.getBoundingClientRect();
+    lastX = e.touches[0].clientX - rect.left;
+    lastY = e.touches[0].clientY - rect.top;
+});
+canvas.addEventListener("touchmove", (e) => {
+    e.preventDefault();
+    if (!drawing) return;
+    const rect = canvas.getBoundingClientRect();
+    const x = e.touches[0].clientX - rect.left;
+    const y = e.touches[0].clientY - rect.top;
+    ctx.beginPath();
+    ctx.moveTo(lastX, lastY);
+    ctx.lineTo(x, y);
+    ctx.stroke();
+    [lastX, lastY] = [x, y];
+});
+canvas.addEventListener("touchend", (e) => { drawing = false; saveSignature(); });
+
+function draw(e) {
+    if (!drawing) return;
+    ctx.beginPath();
+    ctx.moveTo(lastX, lastY);
+    ctx.lineTo(e.offsetX, e.offsetY);
+    ctx.stroke();
+    [lastX, lastY] = [e.offsetX, e.offsetY];
+}
+
+function saveSignature() {
+    document.getElementById("signature").value = canvas.toDataURL("image/png");
+}
+
+// Reset Button
+document.getElementById("reset-btn").addEventListener("click", () => {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    document.getElementById("signature").value = "";
+});
+</script>
+
 </body>
 </html>
