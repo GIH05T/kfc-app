@@ -1,60 +1,62 @@
 .admin-container {
-    max-width: 1200px;
+    width: 95%;
     margin: 20px auto;
-    padding: 20px;
     font-family: Arial, sans-serif;
 }
-.admin-container h1 {
+
+h1 {
     text-align: center;
-    margin-bottom: 20px;
 }
-.search-box {
+
+.admin-controls {
     display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
+    justify-content: space-between;
+    margin-bottom: 10px;
 }
+
 .search-box input[type="text"] {
-    flex: 1;
-    padding: 5px 10px;
-    font-size: 16px;
+    padding: 5px;
+    width: 300px;
 }
+
 .search-box button {
-    padding: 5px 15px;
-    font-size: 16px;
-    cursor: pointer;
+    padding: 5px 10px;
 }
-.search-box .export-btn {
+
+.export-btn {
     background-color: red;
     color: white;
-    border: none;
+    padding: 5px 10px;
+    text-decoration: none;
+    border-radius: 5px;
 }
+
 table {
     width: 100%;
     border-collapse: collapse;
 }
+
 th, td {
-    border: 1px solid #ddd;
+    border: 1px solid #aaa;
     padding: 5px;
     text-align: center;
-    font-size: 14px;
 }
+
 th {
-    background-color: #f4f4f4;
+    background-color: #f0f0f0;
 }
-input[type="text"], input[type="number"], input[type="date"], select {
-    width: 90%;
-    padding: 3px;
+
+input[type="text"], input[type="number"], select {
+    width: 100%;
     box-sizing: border-box;
 }
-button.save-btn {
-    background-color: #4CAF50;
-    color: white;
-    border: none;
+
+button {
+    padding: 2px 5px;
     cursor: pointer;
-    padding: 5px 10px;
 }
-a.delete {
+
+.delete {
     color: red;
     text-decoration: none;
-    margin-left: 5px;
 }
