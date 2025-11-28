@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kinder-Ferien-Club Steinen – Online-Anmeldung</title>
+<title>Kinder-Ferien-Club Steinen – Online-Anmeldung 2026</title>
 <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
 <div class="container">
     <img src="/static/icon-kfc.png" class="logo" alt="Ferienclub Logo">
     <h1>Kinder-Ferien-Club Steinen</h1>
-    <h2>Online-Anmeldung</h2>
+    <h2>Online-Anmeldung 2026</h2>
 
     <form id="registration-form" action="/" method="POST">
         <label for="Vorname">Vorname<span class="required">*</span></label>
@@ -19,7 +19,7 @@
         <label for="Nachname">Nachname<span class="required">*</span></label>
         <input type="text" id="Nachname" name="Nachname" placeholder="Mustermann" required>
 
-        <label for="email">E-Mail</label>
+        <label for="email">E-Mail (freiwillig)</label>
         <input type="email" id="email" name="Email" placeholder="max@beispiel.de">
 
         <label for="strasse">Straße<span class="required">*</span></label>
@@ -37,9 +37,9 @@
         <label for="notfallnummer">Notfalltelefonnummer<span class="required">*</span></label>
         <input type="tel" id="notfallnummer" name="Notfallnummer" placeholder="z.B. 01234 567890" required>
 
-        <label for="allergien">Allergien</label>
+        <label for="allergien">Allergien (freiwillig)</label>
         <select id="allergien" name="Allergien">
-            <option value="">-- Bitte wählen --</option>
+            <option value="">-- Keine Angabe --</option>
             <option value="keine">Keine</option>
             <option value="nüsse">Nüsse</option>
             <option value="laktose">Laktose</option>
@@ -57,7 +57,7 @@
             <label for="dsgvo">Ich stimme der <a href="/datenschutz" target="_blank">Datenschutzerklärung</a> zu <span class="required">*</span></label>
         </div>
 
-        <button type="submit">Jetzt anmelden</button>
+        <button type="submit" id="submit-btn" disabled>Jetzt anmelden</button>
     </form>
 </div>
 
@@ -65,8 +65,10 @@
 // --- Signatur Pad ---
 const canvas = document.getElementById("signature-pad");
 const ctx = canvas.getContext("2d");
+const hiddenInput = document.getElementById("signature");
+const resetBtn = document.getElementById("reset-btn");
+const submitBtn = document.getElementById("submit-btn");
 
-// Canvas auf tatsächliche CSS-Größe skalieren
 function resizeCanvas() {
     const style = getComputedStyle(canvas);
     canvas.width = parseInt(style.width);
@@ -79,41 +81,40 @@ resizeCanvas();
 window.addEventListener("resize", resizeCanvas);
 
 let drawing = false;
-let lastX = 0;
-let lastY = 0;
+let lastX = 0, lastY = 0;
+
+function getPointerPos(e) {
+    const rect = canvas.getBoundingClientRect();
+    if (e.touches) {
+        return [e.touches[0].clientX - rect.left, e.touches[0].clientY - rect.top];
+    } else {
+        return [e.offsetX, e.offsetY];
+    }
+}
 
 // Maus Events
 canvas.addEventListener("mousedown", (e) => {
     drawing = true;
-    [lastX, lastY] = [e.offsetX, e.offsetY];
+    [lastX, lastY] = getPointerPos(e);
 });
-canvas.addEventListener("mousemove", drawMouse);
+canvas.addEventListener("mousemove", (e) => {
+    if (!drawing) return;
+    const [x, y] = getPointerPos(e);
+    ctx.beginPath();
+    ctx.moveTo(lastX, lastY);
+    ctx.lineTo(x, y);
+    ctx.stroke();
+    [lastX, lastY] = [x, y];
+});
 canvas.addEventListener("mouseup", () => { drawing = false; saveSignature(); });
 canvas.addEventListener("mouseout", () => { drawing = false; saveSignature(); });
 
-function drawMouse(e) {
-    if (!drawing) return;
-    ctx.beginPath();
-    ctx.moveTo(lastX, lastY);
-    ctx.lineTo(e.offsetX, e.offsetY);
-    ctx.stroke();
-    [lastX, lastY] = [e.offsetX, e.offsetY];
-}
-
 // Touch Events
-canvas.addEventListener("touchstart", (e) => {
-    e.preventDefault();
-    drawing = true;
-    const rect = canvas.getBoundingClientRect();
-    lastX = e.touches[0].clientX - rect.left;
-    lastY = e.touches[0].clientY - rect.top;
-});
+canvas.addEventListener("touchstart", (e) => { e.preventDefault(); drawing = true; [lastX, lastY] = getPointerPos(e); });
 canvas.addEventListener("touchmove", (e) => {
     e.preventDefault();
     if (!drawing) return;
-    const rect = canvas.getBoundingClientRect();
-    const x = e.touches[0].clientX - rect.left;
-    const y = e.touches[0].clientY - rect.top;
+    const [x, y] = getPointerPos(e);
     ctx.beginPath();
     ctx.moveTo(lastX, lastY);
     ctx.lineTo(x, y);
@@ -123,45 +124,38 @@ canvas.addEventListener("touchmove", (e) => {
 canvas.addEventListener("touchend", () => { drawing = false; saveSignature(); });
 
 function saveSignature() {
-    document.getElementById("signature").value = canvas.toDataURL("image/png");
+    hiddenInput.value = canvas.toDataURL("image/png");
+    checkForm();
 }
 
 // Reset Button
-document.getElementById("reset-btn").addEventListener("click", () => {
+resetBtn.addEventListener("click", () => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    document.getElementById("signature").value = "";
+    hiddenInput.value = "";
+    checkForm();
 });
 
-const submitBtn = document.getElementById("submit-btn");
-
+// --- Button aktivieren/ deaktivieren ---
 function checkForm() {
-    const requiredFields = document.querySelectorAll(
-        "#Vorname, #Nachname, #strasse, #plz, #ort, #geburtsdatum, #notfallnummer"
-    );
+    const requiredFields = ["Vorname","Nachname","strasse","plz","ort","geburtsdatum","notfallnummer"];
+    let allFilled = requiredFields.every(id => document.getElementById(id).value.trim() !== "");
+    const dsgvoChecked = document.getElementById("dsgvo").checked;
+    const sigFilled = hiddenInput.value.trim() !== "";
 
-    let allFilled = true;
-    requiredFields.forEach(field => {
-        if (!field.value.trim()) allFilled = false;
-    });
-
-    const dsgvo = document.getElementById("dsgvo").checked;
-    const signatureFilled = document.getElementById("signature").value.trim() !== "";
-
-    if (allFilled && dsgvo && signatureFilled) {
+    if (allFilled && dsgvoChecked && sigFilled) {
         submitBtn.disabled = false;
-        submitBtn.style.background = "#7ccc00";  // ✅ gleiches Grün wie "Online Anmeldung"
+        submitBtn.style.background = "#7ccc00";
     } else {
         submitBtn.disabled = true;
-        submitBtn.style.background = "#aaa";     // grau
+        submitBtn.style.background = "#aaa";
     }
 }
 
-// Auf ALLE Änderungen reagieren
+// Überprüfen bei Input, Checkbox oder Reset
 document.addEventListener("input", checkForm);
 document.getElementById("dsgvo").addEventListener("change", checkForm);
-document.getElementById("reset-btn").addEventListener("click", checkForm);
+resetBtn.addEventListener("click", checkForm);
+
 </script>
-
-
 </body>
 </html>
