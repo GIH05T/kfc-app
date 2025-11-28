@@ -10,15 +10,16 @@
     <h1>Adminbereich</h1>
 
     <!-- Suche -->
-    <form method="get" class="search-box">
+    <form method="get" class="search-box" style="display:inline-block; margin-right:10px;">
         <input type="hidden" name="pw" value="{{ pw }}">
         <input type="text" name="search" placeholder="Suchen nach ID, Vorname, Nachname" value="{{ search_query }}">
         <button type="submit">🔍 Suchen</button>
     </form>
 
-    <a href="/export_excel?pw={{ pw }}">📥 Excel Export</a>
+    <!-- Excel Export -->
+    <a href="/export_excel?pw={{ pw }}" style="display:inline-block;">📥 Excel Export</a>
 
-    <table border="1">
+    <table border="1" style="margin-top:15px; width:100%; border-collapse: collapse;">
         <tr>
             <th>ID</th>
             <th>Geschlecht</th>
@@ -32,6 +33,7 @@
             <th>Anmeldung</th>
             <th>Punkte</th>
             <th>Alter</th>
+            <th>Gruppe</th>
             <th>Unterschrift</th>
             <th>Aktion</th>
         </tr>
@@ -74,13 +76,13 @@
             <!-- Anmeldung: Tage + Bibelverse -->
             <td>
                 <div style="display:flex; flex-direction:column; gap:4px;">
-                    <!-- Tage -->
+                    <!-- obere Reihe: Tage -->
                     <div style="display:flex; justify-content:space-between;">
                         {% for i in range(5) %}
                         <input type="checkbox" name="Tag{{ i+1 }}" {% if r['Tag'+i|string] %}checked{% endif %}>
                         {% endfor %}
                     </div>
-                    <!-- Bibelverse -->
+                    <!-- untere Reihe: Bibelverse -->
                     <div style="display:flex; justify-content:space-between;">
                         {% for i in range(5) %}
                         <input type="checkbox" name="Verse{{ i+1 }}" {% if r['Verse'+i|string] %}checked{% endif %}>
@@ -89,9 +91,10 @@
                 </div>
             </td>
 
-            <!-- Punkte, Alter, Unterschrift -->
+            <!-- Punkte, Alter, Gruppe, Unterschrift -->
             <td>{{ r.Punkte }}</td>
             <td>{{ r.Alter }}</td>
+            <td><input type="text" name="Gruppe" value="{{ r.Gruppe }}"></td>
             <td>
                 {% if r.Unterschrift %}
                     <img src="{{ r.Unterschrift }}" width="80">
