@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, send_file
-import json, os, datetime
+import json, os
+from datetime import datetime
 from openpyxl import Workbook
 from openpyxl.drawing.image import Image as XLImage
 from io import BytesIO
@@ -29,21 +30,20 @@ def generate_id():
     else:
         return max(r["ID"] for r in registrations) + 1
 
-# --- Alter & Gruppe berechnen ---
-def calculate_age_and_group(birthdate_str):
-    try:
-        birthdate = datetime.datetime.strptime(birthdate_str, "%Y-%m-%d").date()
-        today = datetime.date.today()
-        age = today.year - birthdate.year - ((today.month, today.day) < (birthdate.month, birthdate.day))
-        if 5 <= age <= 7:
-            group = "5-7"
-        elif 8 <= age <= 13:
-            group = "8-13"
-        else:
-            group = "?"
-        return age, group
-    except:
-        return None, "?"
+# --- Altersberechnung & Gruppe ---
+def calculate_age(birthdate):
+    today = datetime.today()
+    bday = datetime.strptime(birthdate, "%Y-%m-%d")
+    age = today.year - bday.year - ((today.month, today.day) < (bday.month, bday.day))
+    return age
+
+def determine_group(age):
+    if 5 <= age <= 7:
+        return "5-7"
+    elif 8 <= age <= 13:
+        return "8-13"
+    else:
+        return "Außerhalb"
 
 # --- Routes ---
 @app.route("/", methods=["GET", "POST"])
@@ -51,21 +51,25 @@ def index():
     if request.method == "POST":
         registrations = load_data()
         reg_id = generate_id()
+        birthdate = request.form.get("Geburtsdatum")
+        age = calculate_age(birthdate)
+        group = determine_group(age)
         data = {
             "ID": reg_id,
             "Geschlecht": request.form.get("Geschlecht"),
             "Vorname": request.form.get("Vorname"),
             "Nachname": request.form.get("Nachname"),
-            "Email": request.form.get("Email"),
             "Strasse": request.form.get("Strasse"),
             "PLZ": request.form.get("PLZ"),
             "Ort": request.form.get("Ort"),
-            "Geburtsdatum": request.form.get("Geburtsdatum"),
-            "Notfallnummer": request.form.get("Notfallnummer"),
+            "Geburtsdatum": birthdate,
+            "Alter": age,
+            "Gruppe": group,
             "Allergien": request.form.get("Allergien"),
             "Unterschrift": request.form.get("Unterschrift"),
             "DSGVO": bool(request.form.get("DSGVO")),
-            # Anmeldung: Tage & Verse
+            "Punkte": 0,
+            # Anmeldung Kästchen
             "Tag1": bool(request.form.get("Tag1")),
             "Tag2": bool(request.form.get("Tag2")),
             "Tag3": bool(request.form.get("Tag3")),
@@ -77,11 +81,6 @@ def index():
             "Verse4": bool(request.form.get("Verse4")),
             "Verse5": bool(request.form.get("Verse5")),
         }
-        age, group = calculate_age_and_group(data["Geburtsdatum"])
-        data["Alter"] = age
-        data["Gruppe"] = group
-        # Punkte berechnen: Summe von Tag + Verse
-        data["Punkte"] = sum([data[f"Tag{i}"] + data[f"Verse{i}"] for i in range(1,6)])
         registrations.append(data)
         save_data(registrations)
         return redirect(url_for("success", reg_id=reg_id))
@@ -92,7 +91,6 @@ def success():
     reg_id = request.args.get("reg_id")
     return render_template("success.html", reg_id=reg_id)
 
-# --- Admin-Seite ---
 @app.route("/admin", methods=["GET", "POST"])
 def admin():
     pw = request.args.get("pw")
@@ -100,50 +98,50 @@ def admin():
         return "Zugriff verweigert", 403
 
     registrations = load_data()
-
-    # Berechne Alter & Gruppe nochmal für Anzeige
-    for r in registrations:
-        age, group = calculate_age_and_group(r.get("Geburtsdatum",""))
-        r["Alter"] = age
-        r["Gruppe"] = group
-
-    search_query = request.args.get("search","").lower()
+    search_query = request.args.get("search", "").lower()
     if search_query:
-        registrations = [r for r in registrations if search_query in str(r["ID"]) 
-                         or search_query in r["Vorname"].lower() 
-                         or search_query in r["Nachname"].lower()]
+        registrations = [r for r in registrations if
+                         search_query in str(r["ID"]).lower() or
+                         search_query in r["Vorname"].lower() or
+                         search_query in r["Nachname"].lower()]
+
+    if request.method == "POST":
+        reg_id = int(request.form.get("ID"))
+        for r in registrations:
+            if r["ID"] == reg_id:
+                r["Geschlecht"] = request.form.get("Geschlecht")
+                r["Vorname"] = request.form.get("Vorname")
+                r["Nachname"] = request.form.get("Nachname")
+                r["Strasse"] = request.form.get("Strasse")
+                r["PLZ"] = request.form.get("PLZ")
+                r["Ort"] = request.form.get("Ort")
+                r["Allergien"] = request.form.get("Allergien")
+                r["Geburtsdatum"] = request.form.get("Geburtsdatum")
+                r["Alter"] = calculate_age(r["Geburtsdatum"])
+                r["Gruppe"] = determine_group(r["Alter"])
+                r["Punkte"] = int(request.form.get("Punkte", 0))
+                for i in range(1,6):
+                    r[f"Tag{i}"] = bool(request.form.get(f"Tag{i}"))
+                    r[f"Verse{i}"] = bool(request.form.get(f"Verse{i}"))
+        save_data(registrations)
+        return redirect(url_for("admin", pw=pw, search=search_query))
 
     return render_template("admin.html", registrations=registrations, pw=pw, search_query=search_query)
 
-# --- Update Eintrag ---
-@app.route("/update/<int:reg_id>", methods=["POST"])
-def update_entry(reg_id):
+@app.route("/delete/<int:reg_id>")
+def delete_registration(reg_id):
     pw = request.args.get("pw")
     if pw != ADMIN_PASSWORD:
         return "Zugriff verweigert", 403
-
     registrations = load_data()
-    for r in registrations:
-        if r["ID"] == reg_id:
-            for key in r.keys():
-                if key in request.form:
-                    value = request.form[key]
-                    # Checkboxen speichern als bool
-                    if key.startswith("Tag") or key.startswith("Verse"):
-                        r[key] = value == "on"
-                    else:
-                        r[key] = value
-            # Alter & Gruppe aktualisieren
-            age, group = calculate_age_and_group(r.get("Geburtsdatum",""))
-            r["Alter"] = age
-            r["Gruppe"] = group
-            # Punkte aktualisieren
-            r["Punkte"] = sum([r[f"Tag{i}"] + r[f"Verse{i}"] for i in range(1,6)])
-            break
+    registrations = [r for r in registrations if r["ID"] != reg_id]
     save_data(registrations)
     return redirect(url_for("admin", pw=pw))
 
-# --- Excel Export ---
+@app.route("/datenschutz")
+def datenschutz():
+    return render_template("datenschutz.html")
+
 @app.route("/export_excel")
 def export_excel():
     pw = request.args.get("pw")
@@ -180,11 +178,6 @@ def export_excel():
     output = "registrations.xlsx"
     wb.save(output)
     return send_file(output, as_attachment=True)
-
-@app.route("/datenschutz")
-def datenschutz():
-    return render_template("datenschutz.html")
-
 
 if __name__ == "__main__":
     app.run(debug=True)
