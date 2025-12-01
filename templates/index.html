@@ -13,39 +13,39 @@
     <h2>Online-Anmeldung 2026</h2>
 
     <form id="registration-form" action="/" method="POST">
-
-        <label>Geschlecht<span class="required">*</span></label>
-        <select name="Geschlecht" required>
-            <option value="">Bitte wählen</option>
-            <option value="m">männlich</option>
-            <option value="w">weiblich</option>
-        </select>
-
-        <label>Vorname<span class="required">*</span></label>
+	
+		<label for="geschlecht">Geschlecht<span class="required">*</span></label>
+		<select id="geschlecht" name="Geschlecht" required>
+			<option value="">-- Bitte wählen --</option>
+			<option value="m">männlich</option>
+			<option value="w">weiblich</option>
+		</select>
+		
+        <label for="Vorname">Vorname<span class="required">*</span></label>
         <input type="text" id="Vorname" name="Vorname" placeholder="Max" required>
 
-        <label>Nachname<span class="required">*</span></label>
+        <label for="Nachname">Nachname<span class="required">*</span></label>
         <input type="text" id="Nachname" name="Nachname" placeholder="Mustermann" required>
 
-        <label>E-Mail (freiwillig)</label>
+        <label for="email">E-Mail (freiwillig)</label>
         <input type="email" id="email" name="Email" placeholder="max@beispiel.de">
 
-        <label>Straße<span class="required">*</span></label>
+        <label for="strasse">Straße<span class="required">*</span></label>
         <input type="text" id="strasse" name="Strasse" placeholder="Musterstraße 12" required>
 
-        <label>Postleitzahl<span class="required">*</span></label>
+        <label for="plz">Postleitzahl<span class="required">*</span></label>
         <input type="text" id="plz" name="PLZ" placeholder="79665" required>
 
-        <label>Ort<span class="required">*</span></label>
+        <label for="ort">Ort<span class="required">*</span></label>
         <input type="text" id="ort" name="Ort" placeholder="Steinen" required>
 
-        <label>Geburtsdatum<span class="required">*</span></label>
+        <label for="geburtsdatum">Geburtsdatum<span class="required">*</span></label>
         <input type="date" id="geburtsdatum" name="Geburtsdatum" required>
 
-        <label>Notfalltelefonnummer<span class="required">*</span></label>
-        <input type="tel" id="notfallnummer" name="Notfallnummer" placeholder="01234 567890" required>
+        <label for="notfallnummer">Notfalltelefonnummer<span class="required">*</span></label>
+        <input type="tel" id="notfallnummer" name="Notfallnummer" placeholder="z.B. 01234 567890" required>
 
-        <label>Allergien (freiwillig)</label>
+        <label for="allergien">Allergien (freiwillig)</label>
         <select id="allergien" name="Allergien">
             <option value="">-- Keine Angabe --</option>
             <option value="keine">Keine</option>
@@ -70,7 +70,7 @@
 </div>
 
 <script>
-// --- Signatur Pad & Button aktiv ---
+// --- Signatur Pad ---
 const canvas = document.getElementById("signature-pad");
 const ctx = canvas.getContext("2d");
 const hiddenInput = document.getElementById("signature");
@@ -83,39 +83,87 @@ function resizeCanvas() {
     canvas.height = parseInt(style.height);
     ctx.lineWidth = 2;
     ctx.lineCap = "round";
+    ctx.strokeStyle = "#000";
 }
 resizeCanvas();
 window.addEventListener("resize", resizeCanvas);
 
 let drawing = false;
-let lastX = 0;
-let lastY = 0;
+let lastX = 0, lastY = 0;
 
-canvas.addEventListener("mousedown", e => { drawing=true; [lastX,lastY]=[e.offsetX,e.offsetY]; });
-canvas.addEventListener("mousemove", e => { if(!drawing) return; ctx.beginPath(); ctx.moveTo(lastX,lastY); ctx.lineTo(e.offsetX,e.offsetY); ctx.stroke(); [lastX,lastY]=[e.offsetX,e.offsetY]; });
-canvas.addEventListener("mouseup", ()=>{ drawing=false; saveSignature(); });
-canvas.addEventListener("mouseout", ()=>{ drawing=false; saveSignature(); });
-
-canvas.addEventListener("touchstart", e=>{ e.preventDefault(); drawing=true; const rect=canvas.getBoundingClientRect(); lastX=e.touches[0].clientX-rect.left; lastY=e.touches[0].clientY-rect.top; });
-canvas.addEventListener("touchmove", e=>{ e.preventDefault(); if(!drawing) return; const rect=canvas.getBoundingClientRect(); const x=e.touches[0].clientX-rect.left; const y=e.touches[0].clientY-rect.top; ctx.beginPath(); ctx.moveTo(lastX,lastY); ctx.lineTo(x,y); ctx.stroke(); [lastX,lastY]=[x,y]; });
-canvas.addEventListener("touchend", ()=>{ drawing=false; saveSignature(); });
-
-function saveSignature(){ hiddenInput.value=canvas.toDataURL("image/png"); }
-
-resetBtn.addEventListener("click", ()=>{ ctx.clearRect(0,0,canvas.width,canvas.height); hiddenInput.value=""; checkForm(); });
-
-function checkForm(){
-    const requiredFields = ["Vorname","Nachname","strasse","plz","ort","geburtsdatum","notfallnummer"];
-    let ok=true; requiredFields.forEach(f=>{if(!document.getElementById(f).value.trim()) ok=false;});
-    if(ok && document.querySelector("#dsgvo").checked && hiddenInput.value.trim()!==""){
-        submitBtn.disabled=false; submitBtn.style.background="#7ccc00";
-    } else { submitBtn.disabled=true; submitBtn.style.background="#aaa"; }
+function getPointerPos(e) {
+    const rect = canvas.getBoundingClientRect();
+    if (e.touches) {
+        return [e.touches[0].clientX - rect.left, e.touches[0].clientY - rect.top];
+    } else {
+        return [e.offsetX, e.offsetY];
+    }
 }
 
+// Maus Events
+canvas.addEventListener("mousedown", (e) => {
+    drawing = true;
+    [lastX, lastY] = getPointerPos(e);
+});
+canvas.addEventListener("mousemove", (e) => {
+    if (!drawing) return;
+    const [x, y] = getPointerPos(e);
+    ctx.beginPath();
+    ctx.moveTo(lastX, lastY);
+    ctx.lineTo(x, y);
+    ctx.stroke();
+    [lastX, lastY] = [x, y];
+});
+canvas.addEventListener("mouseup", () => { drawing = false; saveSignature(); });
+canvas.addEventListener("mouseout", () => { drawing = false; saveSignature(); });
+
+// Touch Events
+canvas.addEventListener("touchstart", (e) => { e.preventDefault(); drawing = true; [lastX, lastY] = getPointerPos(e); });
+canvas.addEventListener("touchmove", (e) => {
+    e.preventDefault();
+    if (!drawing) return;
+    const [x, y] = getPointerPos(e);
+    ctx.beginPath();
+    ctx.moveTo(lastX, lastY);
+    ctx.lineTo(x, y);
+    ctx.stroke();
+    [lastX, lastY] = [x, y];
+});
+canvas.addEventListener("touchend", () => { drawing = false; saveSignature(); });
+
+function saveSignature() {
+    hiddenInput.value = canvas.toDataURL("image/png");
+    checkForm();
+}
+
+// Reset Button
+resetBtn.addEventListener("click", () => {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    hiddenInput.value = "";
+    checkForm();
+});
+
+// --- Button aktivieren/ deaktivieren ---
+function checkForm() {
+    const requiredFields = ["Vorname","Nachname","strasse","plz","ort","geburtsdatum","notfallnummer"];
+    let allFilled = requiredFields.every(id => document.getElementById(id).value.trim() !== "");
+    const dsgvoChecked = document.getElementById("dsgvo").checked;
+    const sigFilled = hiddenInput.value.trim() !== "";
+
+    if (allFilled && dsgvoChecked && sigFilled) {
+        submitBtn.disabled = false;
+        submitBtn.style.background = "#7ccc00";
+    } else {
+        submitBtn.disabled = true;
+        submitBtn.style.background = "#aaa";
+    }
+}
+
+// Überprüfen bei Input, Checkbox oder Reset
 document.addEventListener("input", checkForm);
 document.getElementById("dsgvo").addEventListener("change", checkForm);
-document.getElementById("reset-btn").addEventListener("click", checkForm);
-</script>
+resetBtn.addEventListener("click", checkForm);
 
+</script>
 </body>
 </html>

@@ -9,14 +9,13 @@
 <div class="admin-container">
 <h1>Adminbereich</h1>
 
-<div class="admin-controls">
-    <form method="get" class="search-box">
-        <input type="hidden" name="pw" value="{{ pw }}">
-        <input type="text" name="search" placeholder="Suchen nach ID, Vorname, Nachname" value="{{ search_query }}">
-        <button type="submit">🔍 Suchen</button>
-    </form>
-    <a href="/export_excel?pw={{ pw }}" class="export-btn">📥 Excel Export</a>
-</div>
+<form method="get" class="search-box">
+<input type="hidden" name="pw" value="{{ pw }}">
+<input type="text" name="search" placeholder="Suchen nach ID, Vorname, Nachname" value="{{ search_query }}">
+<button type="submit">🔍 Suchen</button>
+</form>
+
+<a href="/export_excel?pw={{ pw }}">📥 Excel Export</a>
 
 <table border="1">
 <tr>
@@ -27,7 +26,8 @@
     <th>Straße</th>
     <th>PLZ</th>
     <th>Ort</th>
-    <th>Geburtsdatum</th>
+    <th>Telefon</th>
+    <th>E-Mail</th>
     <th>Allergien</th>
     <th>Anmeldung</th>
     <th>Punkte</th>
@@ -38,7 +38,7 @@
 </tr>
 
 {% for r in registrations %}
-<form method="POST" action="/update/{{ r.ID }}">
+<form method="POST" action="/update/{{ r.ID }}?pw={{ pw }}">
 <tr>
     <td>{{ r.ID }}</td>
     <td>
@@ -52,7 +52,8 @@
     <td><input type="text" name="Strasse" value="{{ r.Strasse }}"></td>
     <td><input type="text" name="PLZ" value="{{ r.PLZ }}"></td>
     <td><input type="text" name="Ort" value="{{ r.Ort }}"></td>
-    <td><input type="date" name="Geburtsdatum" value="{{ r.Geburtsdatum }}"></td>
+    <td><input type="text" name="Notfallnummer" value="{{ r.Notfallnummer }}"></td>
+    <td><input type="text" name="Email" value="{{ r.Email }}"></td>
     <td>
         <select name="Allergien">
             <option value="">--</option>
@@ -64,19 +65,17 @@
         </select>
     </td>
 
-    <!-- Anmeldung Kästchen -->
+    <!-- Anmeldung: Tage oben, Bibelverse unten -->
     <td>
         <div style="display:flex; flex-direction:column;">
-            <div style="display:flex; justify-content:space-between; font-weight:bold;">Tag(e)</div>
             <div style="display:flex; justify-content:space-between;">
-                {% for i in range(5) %}
-                <input type="checkbox" name="Tag{{ i+1 }}" {% if r['Tag'+i|string] %}checked{% endif %}>
+                {% for i in range(1,6) %}
+                <input type="checkbox" name="Tag{{ i }}" {% if r['Tag'+i|string] %}checked{% endif %}>
                 {% endfor %}
             </div>
-            <div style="display:flex; justify-content:space-between; font-weight:bold; margin-top:2px;">Bibelvers</div>
-            <div style="display:flex; justify-content:space-between; margin-top:2px;">
-                {% for i in range(5) %}
-                <input type="checkbox" name="Verse{{ i+1 }}" {% if r['Verse'+i|string] %}checked{% endif %}>
+            <div style="display:flex; justify-content:space-between; margin-top:4px;">
+                {% for i in range(1,6) %}
+                <input type="checkbox" name="Verse{{ i }}" {% if r['Verse'+i|string] %}checked{% endif %}>
                 {% endfor %}
             </div>
         </div>
@@ -92,7 +91,7 @@
     </td>
     <td>
         <button type="submit">💾</button>
-        <a href="/delete/{{ r.ID }}?pw={{ pw }}" class="delete">🗑</a>
+        <a href="/delete/{{ r.ID }}?pw={{ pw }}">🗑</a>
     </td>
 </tr>
 </form>
