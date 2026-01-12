@@ -2,7 +2,64 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
+<title>Adminbereich</title><!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
 <title>Adminbereich</title>
+<link rel="stylesheet" href="/static/admin.css">
+</head>
+<body>
+
+<h1>Adminbereich</h1>
+
+<input type="text" id="search" placeholder="Suchen...">
+
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Name</th>
+<th>Tag 1</th>
+<th>Tag 2</th>
+<th>Tag 3</th>
+<th>Vers 1</th>
+<th>Vers 2</th>
+<th>Vers 3</th>
+<th>Punkte</th>
+<th>Aktion</th>
+</tr>
+</thead>
+<tbody>
+{% for k in data %}
+<tr>
+<form method="POST" action="/save/{{ k.ID }}?pw={{ pw }}">
+<td>{{ k.ID }}</td>
+<td>{{ k.Vorname }} {{ k.Nachname }}</td>
+
+<td><input type="checkbox" name="tag1" {% if k.tag1 %}checked{% endif %}></td>
+<td><input type="checkbox" name="tag2" {% if k.tag2 %}checked{% endif %}></td>
+<td><input type="checkbox" name="tag3" {% if k.tag3 %}checked{% endif %}></td>
+
+<td><input type="checkbox" name="verse1" {% if k.verse1 %}checked{% endif %}></td>
+<td><input type="checkbox" name="verse2" {% if k.verse2 %}checked{% endif %}></td>
+<td><input type="checkbox" name="verse3" {% if k.verse3 %}checked{% endif %}></td>
+
+<td>{{ k.punkte or 0 }}</td>
+
+<td>
+<button type="submit">💾</button>
+<a href="/delete/{{ k.ID }}?pw={{ pw }}" onclick="return confirm('Kind wirklich löschen?')">🗑</a>
+</td>
+</form>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+
+</body>
+</html>
+
 <link rel="stylesheet" href="/static/admin.css">
 </head>
 <body>
