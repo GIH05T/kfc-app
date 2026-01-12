@@ -2,158 +2,103 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<title>Adminbereich</title><!DOCTYPE html>
-<html lang="de">
-<head>
-<meta charset="UTF-8">
-<title>Adminbereich</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin – Kinder-Ferien-Club</title>
 <link rel="stylesheet" href="/static/admin.css">
 </head>
 <body>
 
-<h1>Adminbereich</h1>
-
-<input type="text" id="search" placeholder="Suchen...">
-
-<table>
-<thead>
-<tr>
-<th>ID</th>
-<th>Name</th>
-<th>Tag 1</th>
-<th>Tag 2</th>
-<th>Tag 3</th>
-<th>Vers 1</th>
-<th>Vers 2</th>
-<th>Vers 3</th>
-<th>Punkte</th>
-<th>Aktion</th>
-</tr>
-</thead>
-<tbody>
-{% for k in data %}
-<tr>
-<form method="POST" action="/save/{{ k.ID }}?pw={{ pw }}">
-<td>{{ k.ID }}</td>
-<td>{{ k.Vorname }} {{ k.Nachname }}</td>
-
-<td><input type="checkbox" name="tag1" {% if k.tag1 %}checked{% endif %}></td>
-<td><input type="checkbox" name="tag2" {% if k.tag2 %}checked{% endif %}></td>
-<td><input type="checkbox" name="tag3" {% if k.tag3 %}checked{% endif %}></td>
-
-<td><input type="checkbox" name="verse1" {% if k.verse1 %}checked{% endif %}></td>
-<td><input type="checkbox" name="verse2" {% if k.verse2 %}checked{% endif %}></td>
-<td><input type="checkbox" name="verse3" {% if k.verse3 %}checked{% endif %}></td>
-
-<td>{{ k.punkte or 0 }}</td>
-
-<td>
-<button type="submit">💾</button>
-<a href="/delete/{{ k.ID }}?pw={{ pw }}" onclick="return confirm('Kind wirklich löschen?')">🗑</a>
-</td>
-</form>
-</tr>
-{% endfor %}
-</tbody>
-</table>
-
-</body>
-</html>
-
-<link rel="stylesheet" href="/static/admin.css">
-</head>
-<body>
 <div class="admin-container">
-<h1>Adminbereich</h1>
+    <h1>Adminbereich – Kinder-Ferien-Club</h1>
 
-<form method="get" class="search-box">
-<input type="hidden" name="pw" value="{{ pw }}">
-<input type="text" name="search" placeholder="Suchen nach ID, Vorname, Nachname" value="{{ search_query }}">
-<button type="submit">🔍 Suchen</button>
-</form>
+    <!-- Suche + Export -->
+    <div class="admin-top">
+        <form method="get" action="/admin">
+            <input type="hidden" name="pw" value="{{ pw }}">
+            <input type="text" name="search" placeholder="Suche nach ID, Vor- oder Nachname"
+                   value="{{ search_query }}">
+            <button type="submit">Suchen</button>
+        </form>
 
-<a href="/export_excel?pw={{ pw }}">📥 Excel Export</a>
+        <a class="export-btn" href="/export_excel?pw={{ pw }}">Excel Export</a>
+    </div>
 
-<table border="1">
-<tr>
-    <th>ID</th>
-    <th>Geschlecht</th>
-    <th>Vorname</th>
-    <th>Nachname</th>
-    <th>Straße</th>
-    <th>PLZ</th>
-    <th>Ort</th>
-    <th>Telefon</th>
-    <th>E-Mail</th>
-    <th>Allergien</th>
-    <th>Anmeldung</th>
-    <th>Punkte</th>
-    <th>Alter</th>
-    <th>Gruppe</th>
-    <th>Unterschrift</th>
-    <th>Aktion</th>
-</tr>
+    <!-- Tabelle -->
+    <table>
+        <thead>
+            <tr>
+                <th>Lfd. Nr.</th>
+                <th>Geschlecht</th>
+                <th>Name</th>
+                <th>Alter</th>
+                <th>Gruppe</th>
 
-{% for r in registrations %}
-<form method="POST" action="/update/{{ r.ID }}?pw={{ pw }}">
-<tr>
-    <td>{{ r.ID }}</td>
-    <td>
-        <select name="Geschlecht">
-            <option value="m" {% if r.Geschlecht=='m' %}selected{% endif %}>m</option>
-            <option value="w" {% if r.Geschlecht=='w' %}selected{% endif %}>w</option>
-        </select>
-    </td>
-    <td><input type="text" name="Vorname" value="{{ r.Vorname }}"></td>
-    <td><input type="text" name="Nachname" value="{{ r.Nachname }}"></td>
-    <td><input type="text" name="Strasse" value="{{ r.Strasse }}"></td>
-    <td><input type="text" name="PLZ" value="{{ r.PLZ }}"></td>
-    <td><input type="text" name="Ort" value="{{ r.Ort }}"></td>
-    <td><input type="text" name="Notfallnummer" value="{{ r.Notfallnummer }}"></td>
-    <td><input type="text" name="Email" value="{{ r.Email }}"></td>
-    <td>
-        <select name="Allergien">
-            <option value="">--</option>
-            <option value="keine" {% if r.Allergien=='keine' %}selected{% endif %}>Keine</option>
-            <option value="nüsse" {% if r.Allergien=='nüsse' %}selected{% endif %}>Nüsse</option>
-            <option value="laktose" {% if r.Allergien=='laktose' %}selected{% endif %}>Laktose</option>
-            <option value="ei" {% if r.Allergien=='ei' %}selected{% endif %}>Ei</option>
-            <option value="gluten" {% if r.Allergien=='gluten' %}selected{% endif %}>Gluten</option>
-        </select>
-    </td>
+                <th>Tag 1</th>
+                <th>Tag 2</th>
+                <th>Tag 3</th>
+                <th>Tag 4</th>
+                <th>Tag 5</th>
 
-    <!-- Anmeldung: Tage oben, Bibelverse unten -->
-    <td>
-        <div style="display:flex; flex-direction:column;">
-            <div style="display:flex; justify-content:space-between;">
-                {% for i in range(1,6) %}
-                <input type="checkbox" name="Tag{{ i }}" {% if r['Tag'+i|string] %}checked{% endif %}>
-                {% endfor %}
-            </div>
-            <div style="display:flex; justify-content:space-between; margin-top:4px;">
-                {% for i in range(1,6) %}
-                <input type="checkbox" name="Verse{{ i }}" {% if r['Verse'+i|string] %}checked{% endif %}>
-                {% endfor %}
-            </div>
-        </div>
-    </td>
+                <th>Vers 1</th>
+                <th>Vers 2</th>
+                <th>Vers 3</th>
+                <th>Vers 4</th>
+                <th>Vers 5</th>
 
-    <td>{{ r.Punkte }}</td>
-    <td>{{ r.Alter }}</td>
-    <td>{{ r.Gruppe }}</td>
-    <td>
-        {% if r.Unterschrift %}
-            <img src="{{ r.Unterschrift }}" width="80">
-        {% endif %}
-    </td>
-    <td>
-        <button type="submit">💾</button>
-        <a href="/delete/{{ r.ID }}?pw={{ pw }}">🗑</a>
-    </td>
-</tr>
-</form>
-{% endfor %}
-</table>
+                <th>Punkte</th>
+                <th>Aktionen</th>
+            </tr>
+        </thead>
+
+        <tbody>
+        {% for r in registrations %}
+        <tr>
+        <form method="post" action="/update/{{ r.ID }}?pw={{ pw }}">
+            <td>{{ r.ID }}</td>
+
+            <td>
+                <select name="Geschlecht">
+                    <option value="m" {% if r.Geschlecht == "m" %}selected{% endif %}>m</option>
+                    <option value="w" {% if r.Geschlecht == "w" %}selected{% endif %}>w</option>
+                </select>
+            </td>
+
+            <td>
+                <input name="Vorname" value="{{ r.Vorname }}">
+                <input name="Nachname" value="{{ r.Nachname }}">
+            </td>
+
+            <td>{{ r.Alter }}</td>
+            <td>{{ r.Gruppe }}</td>
+
+            {% for i in range(1,6) %}
+            <td>
+                <input type="checkbox" name="Tag{{ i }}" {% if r["Tag"+i|string] %}checked{% endif %}>
+            </td>
+            {% endfor %}
+
+            {% for i in range(1,6) %}
+            <td>
+                <input type="checkbox" name="Verse{{ i }}" {% if r["Verse"+i|string] %}checked{% endif %}>
+            </td>
+            {% endfor %}
+
+            <td><strong>{{ r.Punkte }}</strong></td>
+
+            <td class="actions">
+                <button type="submit">💾</button>
+                <a class="delete-btn"
+                   href="/delete/{{ r.ID }}?pw={{ pw }}"
+                   onclick="return confirm('Kind wirklich löschen?')">
+                   🗑
+                </a>
+            </td>
+        </form>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
 </div>
+
 </body>
 </html>
