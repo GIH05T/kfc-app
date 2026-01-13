@@ -1,35 +1,77 @@
 body {
     font-family: Arial, sans-serif;
-    background: #f5f5f5;
+    background: #f2f2f2;
     padding: 20px;
+}
+
+.admin-container {
+    max-width: 1000px;
+    margin: auto;
 }
 
 h1 {
     text-align: center;
+    margin-bottom: 20px;
 }
 
-table {
-    width: 100%;
-    border-collapse: collapse;
+.search-form {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.search-form input {
+    flex: 1;
+    padding: 8px;
+}
+
+.export-btn {
+    background: #cc0000;
+    color: white;
+    padding: 8px 14px;
+    text-decoration: none;
+    border-radius: 4px;
+}
+
+.child-card {
     background: white;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 0 8px rgba(0,0,0,0.1);
 }
 
-th, td {
-    border: 1px solid #ccc;
-    padding: 6px;
-    text-align: center;
+.info {
+    margin-bottom: 10px;
 }
 
-th {
-    background: #eee;
+.checkboxes {
+    display: flex;
+    gap: 40px;
+    margin-bottom: 10px;
 }
 
-button {
-    padding: 4px 6px;
+.block label {
     cursor: pointer;
 }
 
-a {
+.actions {
+    display: flex;
+    gap: 15px;
+}
+
+.save-btn {
+    background: #7ccc00;
+    border: none;
+    padding: 8px 14px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.delete-btn {
+    background: #777;
+    color: white;
+    padding: 8px 14px;
     text-decoration: none;
-    font-size: 18px;
+    border-radius: 4px;
 }
