@@ -2,70 +2,111 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<title>Admin – Kinder-Ferien-Club</title>
+<title>Admin – KFC</title>
 <link rel="stylesheet" href="/static/admin.css">
 </head>
 <body>
 
-<div class="admin-container">
-    <h1>Adminbereich</h1>
+<h1>KFC – Adminbereich</h1>
 
-    <form method="get" class="search-form">
-        <input type="hidden" name="pw" value="{{ pw }}">
-        <input type="text" name="search" placeholder="Suche nach ID, Vorname oder Nachname"
-               value="{{ search_query }}">
-        <button type="submit">Suchen</button>
-        <a href="/export_excel?pw={{ pw }}" class="export-btn">Export Excel</a>
-    </form>
+<form method="get">
+    <input type="hidden" name="pw" value="{{ pw }}">
+    <input type="text" name="search" placeholder="Suchen nach ID / Name" value="{{ search_query }}">
+    <button type="submit">Suchen</button>
+</form>
 
-    {% for r in registrations %}
-    <form method="post" action="/update/{{ r.ID }}?pw={{ pw }}" class="child-card">
+<table>
+<thead>
+<tr>
+    <th>ID</th>
+    <th>G</th>
+    <th>Vorname</th>
+    <th>Nachname</th>
+    <th>Alter</th>
+    <th>Gruppe</th>
+    <th>E-Mail</th>
+    <th>Tage</th>
+    <th>Verse</th>
+    <th>Punkte</th>
+    <th>Aktion</th>
+</tr>
+</thead>
 
-        <div class="info">
-            <strong>ID:</strong> {{ r.ID }}<br>
-            <strong>Name:</strong> {{ r.Vorname }} {{ r.Nachname }}<br>
-            <strong>Geschlecht:</strong> {{ r.Geschlecht }}<br>
-            <strong>Alter:</strong> {{ r.Alter }} (Gruppe {{ r.Gruppe }})<br>
-            <strong>Adresse:</strong> {{ r.Strasse }}, {{ r.PLZ }} {{ r.Ort }}<br>
-            <strong>Notfall:</strong> {{ r.Notfallnummer }}<br>
-            <strong>Allergien:</strong> {{ r.Allergien or "—" }}<br>
-            <strong>Punkte:</strong> {{ r.Punkte }}
-        </div>
+<tbody>
+{% for r in registrations %}
+<tr>
+<form method="post" action="/update/{{ r.ID }}?pw={{ pw }}">
 
-        <div class="checkboxes">
-            <div class="block">
-                <strong>Tage</strong><br>
-                {% for i in range(1,6) %}
-                    <label>
-                        <input type="checkbox" name="Tag{{ i }}" {% if r["Tag"+i|string] %}checked{% endif %}>
-                        Tag {{ i }}
-                    </label><br>
-                {% endfor %}
-            </div>
+<td>{{ r.ID }}</td>
 
-            <div class="block">
-                <strong>Verse</strong><br>
-                {% for i in range(1,6) %}
-                    <label>
-                        <input type="checkbox" name="Verse{{ i }}" {% if r["Verse"+i|string] %}checked{% endif %}>
-                        Vers {{ i }}
-                    </label><br>
-                {% endfor %}
-            </div>
-        </div>
+<td>
+    <select name="Geschlecht">
+        <option value="m" {% if r.Geschlecht=="m" %}selected{% endif %}>m</option>
+        <option value="w" {% if r.Geschlecht=="w" %}selected{% endif %}>w</option>
+    </select>
+</td>
 
-        <div class="actions">
-            <button type="submit" class="save-btn">💾 Speichern</button>
-            <a href="/delete/{{ r.ID }}?pw={{ pw }}"
-               class="delete-btn"
-               onclick="return confirm('Kind wirklich löschen?');">
-               🗑 Löschen
-            </a>
-        </div>
+<td><input name="Vorname" value="{{ r.Vorname }}"></td>
+<td><input name="Nachname" value="{{ r.Nachname }}"></td>
 
-    </form>
+<td>{{ r.Alter }}</td>
+<td>{{ r.Gruppe }}</td>
+
+<td>
+    {% if r.Email %}
+        <input name="Email" value="{{ r.Email }}">
+    {% else %}
+        <span class="muted">–</span>
+    {% endif %}
+</td>
+
+<td class="checkbox-line">
+    {% for i in range(1,6) %}
+        <label>
+            <input type="checkbox" name="Tag{{i}}" {% if r["Tag"+i|string] %}checked{% endif %}>
+            {{ i }}
+        </label>
     {% endfor %}
-</div>
+</td>
+
+<td class="checkbox-line">
+    {% for i in range(1,6) %}
+        <label>
+            <input type="checkbox" name="Verse{{i}}" {% if r["Verse"+i|string] %}checked{% endif %}>
+            {{ i }}
+        </label>
+    {% endfor %}
+</td>
+
+<td class="punkte">{{ r.Punkte }}</td>
+
+<td class="actions">
+    <button type="submit" class="save">💾</button>
+    <a href="/delete/{{ r.ID }}?pw={{ pw }}" class="delete"
+       onclick="return confirm('Kind wirklich löschen?');">❌</a>
+</td>
+
+</form>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+
+<script>
+function recalc(row) {
+    let points = 0;
+    row.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+        if (cb.checked) points++;
+    });
+    row.querySelector(".punkte").innerText = points;
+}
+
+document.querySelectorAll("tbody tr").forEach(row => {
+    row.querySelectorAll("input[type='checkbox']").forEach(cb => {
+        cb.addEventListener("change", () => recalc(row));
+    });
+});
+</script>
 
 </body>
 </html>
