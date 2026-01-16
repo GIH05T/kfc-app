@@ -1,77 +1,61 @@
 body {
     font-family: Arial, sans-serif;
-    background: #f2f2f2;
     padding: 20px;
 }
 
-.admin-container {
-    max-width: 1000px;
-    margin: auto;
-}
-
 h1 {
+    margin-bottom: 10px;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-top: 15px;
+    font-size: 14px;
+}
+
+th, td {
+    border: 1px solid #ccc;
+    padding: 6px;
     text-align: center;
-    margin-bottom: 20px;
 }
 
-.search-form {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
+input, select {
+    width: 100%;
 }
 
-.search-form input {
-    flex: 1;
-    padding: 8px;
+.checkbox-line {
+    white-space: nowrap;
 }
 
-.export-btn {
-    background: #cc0000;
-    color: white;
-    padding: 8px 14px;
-    text-decoration: none;
-    border-radius: 4px;
-}
-
-.child-card {
-    background: white;
-    border-radius: 8px;
-    padding: 15px;
-    margin-bottom: 15px;
-    box-shadow: 0 0 8px rgba(0,0,0,0.1);
-}
-
-.info {
-    margin-bottom: 10px;
-}
-
-.checkboxes {
-    display: flex;
-    gap: 40px;
-    margin-bottom: 10px;
-}
-
-.block label {
-    cursor: pointer;
+.checkbox-line label {
+    margin-right: 4px;
+    font-size: 12px;
 }
 
 .actions {
-    display: flex;
-    gap: 15px;
+    white-space: nowrap;
 }
 
-.save-btn {
+.save {
     background: #7ccc00;
     border: none;
-    padding: 8px 14px;
+    padding: 5px 8px;
     cursor: pointer;
-    border-radius: 4px;
 }
 
-.delete-btn {
-    background: #777;
+.delete {
+    background: #cc0000;
     color: white;
-    padding: 8px 14px;
+    padding: 5px 8px;
     text-decoration: none;
-    border-radius: 4px;
+    margin-left: 4px;
+}
+
+.delete:hover {
+    background: #aa0000;
+}
+
+.muted {
+    color: #999;
 }
