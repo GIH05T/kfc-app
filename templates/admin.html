@@ -2,18 +2,22 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<title>Admin – KFC</title>
+<title>Admin – Kinder-Ferien-Club</title>
 <link rel="stylesheet" href="/static/admin.css">
 </head>
 <body>
 
 <h1>KFC – Adminbereich</h1>
 
-<form method="get">
-    <input type="hidden" name="pw" value="{{ pw }}">
-    <input type="text" name="search" placeholder="Suchen nach ID / Name" value="{{ search_query }}">
-    <button type="submit">Suchen</button>
-</form>
+<div class="top-bar">
+    <form method="get">
+        <input type="hidden" name="pw" value="{{ pw }}">
+        <input type="text" name="search" placeholder="Suchen nach ID / Name" value="{{ search_query }}">
+        <button type="submit">Suchen</button>
+    </form>
+
+    <a class="export-btn" href="/export_excel?pw={{ pw }}">⬇ Excel Export</a>
+</div>
 
 <table>
 <thead>
@@ -22,12 +26,15 @@
     <th>G</th>
     <th>Vorname</th>
     <th>Nachname</th>
+    <th>Geburtsdatum</th>
     <th>Alter</th>
     <th>Gruppe</th>
     <th>E-Mail</th>
+    <th>Allergien</th>
     <th>Tage</th>
     <th>Verse</th>
     <th>Punkte</th>
+    <th>Unterschrift</th>
     <th>Aktion</th>
 </tr>
 </thead>
@@ -40,50 +47,67 @@
 <td>{{ r.ID }}</td>
 
 <td>
-    <select name="Geschlecht">
-        <option value="m" {% if r.Geschlecht=="m" %}selected{% endif %}>m</option>
-        <option value="w" {% if r.Geschlecht=="w" %}selected{% endif %}>w</option>
-    </select>
+<select name="Geschlecht">
+    <option value="m" {% if r.Geschlecht=="m" %}selected{% endif %}>m</option>
+    <option value="w" {% if r.Geschlecht=="w" %}selected{% endif %}>w</option>
+</select>
 </td>
 
 <td><input name="Vorname" value="{{ r.Vorname }}"></td>
 <td><input name="Nachname" value="{{ r.Nachname }}"></td>
 
+<td>
+<input type="date" name="Geburtsdatum" value="{{ r.Geburtsdatum }}">
+</td>
+
 <td>{{ r.Alter }}</td>
 <td>{{ r.Gruppe }}</td>
 
 <td>
-    {% if r.Email %}
-        <input name="Email" value="{{ r.Email }}">
-    {% else %}
-        <span class="muted">–</span>
-    {% endif %}
+{% if r.Email %}
+<input name="Email" value="{{ r.Email }}">
+{% else %}
+<span class="muted">–</span>
+{% endif %}
+</td>
+
+<td>
+<input name="Allergien" value="{{ r.Allergien }}">
 </td>
 
 <td class="checkbox-line">
-    {% for i in range(1,6) %}
-        <label>
-            <input type="checkbox" name="Tag{{i}}" {% if r["Tag"+i|string] %}checked{% endif %}>
-            {{ i }}
-        </label>
-    {% endfor %}
+{% for i in range(1,6) %}
+<label>
+<input type="checkbox" name="Tag{{i}}" {% if r["Tag"+i|string] %}checked{% endif %}>
+{{ i }}
+</label>
+{% endfor %}
 </td>
 
 <td class="checkbox-line">
-    {% for i in range(1,6) %}
-        <label>
-            <input type="checkbox" name="Verse{{i}}" {% if r["Verse"+i|string] %}checked{% endif %}>
-            {{ i }}
-        </label>
-    {% endfor %}
+{% for i in range(1,6) %}
+<label>
+<input type="checkbox" name="Verse{{i}}" {% if r["Verse"+i|string] %}checked{% endif %}>
+{{ i }}
+</label>
+{% endfor %}
 </td>
 
 <td class="punkte">{{ r.Punkte }}</td>
 
+<td>
+{% if r.Unterschrift %}
+<img src="{{ r.Unterschrift }}" class="signature-preview">
+{% else %}
+–
+{% endif %}
+</td>
+
 <td class="actions">
-    <button type="submit" class="save">💾</button>
-    <a href="/delete/{{ r.ID }}?pw={{ pw }}" class="delete"
-       onclick="return confirm('Kind wirklich löschen?');">❌</a>
+<button type="submit" class="save">💾</button>
+<a href="/delete/{{ r.ID }}?pw={{ pw }}"
+   class="delete"
+   onclick="return confirm('Kind wirklich löschen?');">❌</a>
 </td>
 
 </form>
