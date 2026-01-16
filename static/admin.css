@@ -35,8 +35,8 @@ table {
 th, td {
     border: 1px solid #999;
     padding: 6px;
+    vertical-align: top; /* <<< WICHTIG */
     text-align: center;
-    vertical-align: middle;
 }
 
 /* Zebra-Streifen */
@@ -52,15 +52,28 @@ input, select {
     box-sizing: border-box;
 }
 
+/* ✅ CHECKBOX-FIX */
 .checkbox-line {
-    white-space: nowrap;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;   /* <<< nicht mehr mittig */
+    gap: 4px;
+    flex-wrap: nowrap;
 }
 
 .checkbox-line label {
-    margin-right: 4px;
-    font-size: 12px;
+    display: flex;
+    flex-direction: column;   /* Zahl unter Checkbox */
+    align-items: center;
+    font-size: 11px;
+    line-height: 1;
 }
 
+.checkbox-line input {
+    margin: 0;
+}
+
+/* Aktionen */
 .actions {
     white-space: nowrap;
 }
@@ -84,12 +97,14 @@ input, select {
     background: #aa0000;
 }
 
+/* Unterschrift */
 .signature-preview {
     width: 80px;
     height: auto;
     border: 1px solid #aaa;
 }
 
+/* Optional */
 .muted {
     color: #888;
 }
