@@ -66,7 +66,6 @@ def index():
             "PLZ": request.form.get("PLZ"),
             "Ort": request.form.get("Ort"),
             "Geburtsdatum": request.form.get("Geburtsdatum"),
-            "Alter": calculate_age_and_group(request.form.get("Geburtsdatum")),
             "Notfallnummer": request.form.get("Notfallnummer"),
             "Unterschrift": request.form.get("Unterschrift"),
             "DSGVO": True
@@ -79,7 +78,7 @@ def index():
 
         
         
-        age, group = calculate_age_and_group(data["Geburtsdatum"])
+        age, group = calculate_age_and_group(entry["Geburtsdatum"])
         entry["Alter"] = age
         entry["Gruppe"] = group
         entry["Punkte"] = 0
