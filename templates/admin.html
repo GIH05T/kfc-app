@@ -7,59 +7,118 @@
 </head>
 <body>
 
-<div class="admin-container">
-<h1>Adminbereich</h1>
+<h1>KFC – Adminbereich</h1>
 
-<div class="controls">
-<input type="text" id="search" placeholder="ID / Vorname / Nachname"
-       value="{{ search }}"
-       oninput="liveSearch(this.value)">
+<div class="top-bar">
+    <form method="get">
+        <input type="hidden" name="pw" value="{{ pw }}">
+        <input type="text" name="search" placeholder="Suchen nach ID / Name" value="{{ search_query }}">
+        <button type="submit">Suchen</button>
+    </form>
 
-<div class="day-filter">
-{% for i in range(1,6) %}
-<a href="?pw={{ pw }}&day=Tag{{ i }}">Tag {{ i }}</a>
-{% endfor %}
-<a href="?pw={{ pw }}">Alle</a>
+    <a class="export-btn" href="/export_excel?pw={{ pw }}">⬇ Excel Export</a>
 </div>
 
-<a class="export-btn" href="/export_excel?pw={{ pw }}">Excel Export</a>
-</div>
+<table>
+<thead>
+<tr>
+    <th>ID</th>
+    <th>Gesch.</th>
+    <th>Vorname</th>
+    <th>Nachname</th>
+	<th>Notfalltelefonnummer</th>
+    <th>Geburtsdatum</th>
+    <th>Alter</th>
+    <th>Gruppe</th>
+    <th>Strasse</th>
+    <th>Ort</th>
+    <th>Tage</th>
+    <th>Verse</th>
+    <th>Punkte</th>
+    <th>Unterschrift</th>
+    <th>Aktion</th>
+</tr>
+</thead>
 
+<tbody>
 {% for r in registrations %}
-<form method="POST" action="/update/{{ r.ID }}?pw={{ pw }}" class="row">
-<b>ID {{ r.ID }}</b><br>
+<tr>
+<form method="post" action="/update/{{ r.ID }}?pw={{ pw }}">
 
-<input name="Vorname" value="{{ r.Vorname }}">
-<input name="Nachname" value="{{ r.Nachname }}">
-<input name="Geburtsdatum" type="date" value="{{ r.Geburtsdatum }}">
-<input name="Strasse" value="{{ r.Strasse }}">
-<input name="PLZ" value="{{ r.PLZ }}">
-<input name="Ort" value="{{ r.Ort }}">
-<input name="Notfallnummer" value="{{ r.Notfallnummer }}">
+<td>{{ r.ID }}</td>
 
-<div class="checks">
+<td>
+<select name="Geschlecht">
+    <option value="m" {% if r.Geschlecht=="m" %}selected{% endif %}>m</option>
+    <option value="w" {% if r.Geschlecht=="w" %}selected{% endif %}>w</option>
+</select>
+</td>
+
+<td><input name="Vorname" value="{{ r.Vorname }}"></td>
+<td><input name="Nachname" value="{{ r.Nachname }}"></td>
+<td><input name="Notfalltelefonnummer" value="{{ r.Notfalltelefonnummer }}"></td>
+<td><input type="date" name="Geburtsdatum" value="{{ r.Geburtsdatum }}"></td>
+<td><input name="Alter" value="{{ r.Alter }}"></td>
+<td><input name="Gruppe" value="{{ r.Gruppe }}"></td>
+<td><input name="Strasse" value="{{ r.Strasse }}"></td>
+<td><input name="Ort" value="{{ r.Ort }}"></td>
+<td><input name="Postleitzahl" value="{{ r.Postleitzahl }}"></td>
+
+<td class="checkbox-line">
 {% for i in range(1,6) %}
-<label><input type="checkbox" name="Tag{{ i }}" {% if r["Tag"+i|string] %}checked{% endif %}> Tag {{ i }}</label>
-<label><input type="checkbox" name="Verse{{ i }}" {% if r["Verse"+i|string] %}checked{% endif %}> Vers {{ i }}</label>
+<label>
+<input type="checkbox" name="Tag{{i}}" {% if r["Tag"+i|string] %}checked{% endif %}>
+{{ i }}
+</label>
 {% endfor %}
-</div>
+</td>
 
-<b>Punkte: {{ r.Punkte }}</b><br>
+<td class="checkbox-line">
+{% for i in range(1,6) %}
+<label>
+<input type="checkbox" name="Verse{{i}}" {% if r["Verse"+i|string] %}checked{% endif %}>
+{{ i }}
+</label>
+{% endfor %}
+</td>
 
+<td class="punkte">{{ r.Punkte }}</td>
+
+<td>
 {% if r.Unterschrift %}
-<img src="{{ r.Unterschrift }}" class="sig">
+<img src="{{ r.Unterschrift }}" class="signature-preview">
+{% else %}
+–
 {% endif %}
+</td>
 
-<button type="submit">💾 Speichern</button>
-<a class="delete" href="/delete/{{ r.ID }}?pw={{ pw }}">🗑 Löschen</a>
+<td class="actions">
+<button type="submit" class="save">💾</button>
+<a href="/delete/{{ r.ID }}?pw={{ pw }}"
+   class="delete"
+   onclick="return confirm('Kind wirklich löschen?');">❌</a>
+</td>
+
 </form>
+</tr>
 {% endfor %}
-</div>
+</tbody>
+</table>
 
 <script>
-function liveSearch(val){
-    window.location = "?pw={{ pw }}&search=" + encodeURIComponent(val);
+function recalc(row) {
+    let points = 0;
+    row.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+        if (cb.checked) points++;
+    });
+    row.querySelector(".punkte").innerText = points;
 }
+
+document.querySelectorAll("tbody tr").forEach(row => {
+    row.querySelectorAll("input[type='checkbox']").forEach(cb => {
+        cb.addEventListener("change", () => recalc(row));
+    });
+});
 </script>
 
 </body>
