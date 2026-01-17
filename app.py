@@ -31,6 +31,24 @@ def calculate_age(birth):
         return today.year - b.year - ((today.month, today.day) < (b.month, b.day))
     except:
         return ""
+        
+# --- Alter & Gruppe berechnen ---
+def calculate_age_and_group(birth):
+    try:
+        b = datetime.datetime.strptime(birth, "%Y-%m-%d").date()
+        today = datetime.date.today()
+        age = today.year - birthdate.year - (
+            (today.month, today.day) < (birthdate.month, birthdate.day)
+        )
+        if 5 <= age <= 7:
+            group = "5-7"
+        elif 8 <= age <= 13:
+            group = "8-13"
+        else:
+            group = "?"
+        return age, group
+    except:
+        return None, "?"
 
 # ---------------- ROUTES ----------------
 @app.route("/", methods=["GET", "POST"])
@@ -48,18 +66,24 @@ def index():
             "PLZ": request.form.get("PLZ"),
             "Ort": request.form.get("Ort"),
             "Geburtsdatum": request.form.get("Geburtsdatum"),
-            "Alter": calculate_age(request.form.get("Geburtsdatum")),
+            "Alter": calculate_age_and_group(request.form.get("Geburtsdatum")),
             "Notfallnummer": request.form.get("Notfallnummer"),
             "Unterschrift": request.form.get("Unterschrift"),
             "DSGVO": True
         }
 
+        # Initiale Tages-/Verswerte
         for i in range(1, 6):
             entry[f"Tag{i}"] = False
             entry[f"Verse{i}"] = False
 
+        
+        
+        age, group = calculate_age_and_group(data["Geburtsdatum"])
+        data["Alter"] = age
+        data["Gruppe"] = group
         entry["Punkte"] = 0
-
+        
         data.append(entry)
         save_data(data)
         return redirect(url_for("success", reg_id=reg_id))
@@ -70,6 +94,7 @@ def index():
 def success():
     return render_template("success.html", reg_id=request.args.get("reg_id"))
 
+# --- Admin ---
 @app.route("/admin", methods=["GET"])
 def admin():
     pw = request.args.get("pw")
@@ -77,6 +102,12 @@ def admin():
         return "Zugriff verweigert", 403
 
     data = load_data()
+    
+    for r in data:
+        age, group = calculate_age_and_group(r.get("Geburtsdatum", ""))
+        r["Alter"] = age
+        r["Gruppe"] = group
+    
     search = request.args.get("search", "").lower()
     day_filter = request.args.get("day", "")
 
@@ -98,7 +129,8 @@ def admin():
         search=search,
         day_filter=day_filter
     )
-
+    
+# --- Update Eintrag ---
 @app.route("/update/<int:reg_id>", methods=["POST"])
 def update_entry(reg_id):
     pw = request.args.get("pw")
@@ -114,7 +146,6 @@ def update_entry(reg_id):
                 elif key in request.form:
                     r[key] = request.form.get(key)
 
-            r["Alter"] = calculate_age(r["Geburtsdatum"])
             r["Punkte"] = sum(
                 r[f"Tag{i}"] + r[f"Verse{i}"] for i in range(1, 6)
             )
