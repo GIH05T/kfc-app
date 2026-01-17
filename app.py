@@ -80,8 +80,8 @@ def index():
         
         
         age, group = calculate_age_and_group(data["Geburtsdatum"])
-        data["Alter"] = age
-        data["Gruppe"] = group
+        entry["Alter"] = age
+        entry["Gruppe"] = group
         entry["Punkte"] = 0
         
         data.append(entry)
