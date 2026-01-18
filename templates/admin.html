@@ -13,14 +13,17 @@
     <form method="get" class="filter-form">
         <input type="hidden" name="pw" value="{{ pw }}">
 
-        <input
-            type="text"
-            name="search"
-            placeholder="Suchen nach ID / Name"
-            value="{{ search }}"
-        >
-
+        <input type="text" name="search" placeholder="Suchen nach ID / Name" value="{{ search }}">
         <button type="submit">Suchen</button>
+
+        <!-- Tagesfilter -->
+        <div class="day-filters">
+            <label><input type="checkbox" name="day" value="Tag1" {% if "Tag1" in selected_days %}checked{% endif %}> Tag1</label>
+            <label><input type="checkbox" name="day" value="Tag2" {% if "Tag2" in selected_days %}checked{% endif %}> Tag2</label>
+            <label><input type="checkbox" name="day" value="Tag3" {% if "Tag3" in selected_days %}checked{% endif %}> Tag3</label>
+            <label><input type="checkbox" name="day" value="Tag4" {% if "Tag4" in selected_days %}checked{% endif %}> Tag4</label>
+            <label><input type="checkbox" name="day" value="Tag5" {% if "Tag5" in selected_days %}checked{% endif %}> Tag5</label>
+        </div>
     </form>
 
     <a class="export-btn" href="/export_excel?pw={{ pw }}">⬇ Excel Export</a>
@@ -52,7 +55,6 @@
 <form method="post" action="/update/{{ r.ID }}?pw={{ pw }}">
 
 <td>{{ r.ID }}</td>
-
 <td>
 <select name="Geschlecht">
     <option value="m" {% if r.Geschlecht == "m" %}selected{% endif %}>m</option>
@@ -64,10 +66,8 @@
 <td><input name="Nachname" value="{{ r.Nachname }}"></td>
 <td><input name="Notfallnummer" value="{{ r.Notfallnummer }}"></td>
 <td><input type="date" name="Geburtsdatum" value="{{ r.Geburtsdatum }}"></td>
-
 <td>{{ r.Alter }}</td>
 <td>{{ r.Gruppe }}</td>
-
 <td><input name="Strasse" value="{{ r.Strasse }}"></td>
 <td><input name="Ort" value="{{ r.Ort }}"></td>
 
@@ -79,9 +79,7 @@
 {{ i }}
 </label>
 {% endfor %}
-
 <hr>
-
 <strong>Verse:</strong><br>
 {% for i in range(1,6) %}
 <label>
@@ -96,16 +94,12 @@
 <td>
 {% if r.Unterschrift %}
 <img src="{{ r.Unterschrift }}" class="signature-preview">
-{% else %}
-–
-{% endif %}
+{% else %} – {% endif %}
 </td>
 
 <td class="actions">
 <button type="submit" class="save">💾</button>
-<a href="/delete/{{ r.ID }}?pw={{ pw }}"
-   class="delete"
-   onclick="return confirm('Kind wirklich löschen?');">❌</a>
+<a href="/delete/{{ r.ID }}?pw={{ pw }}" class="delete" onclick="return confirm('Kind wirklich löschen?');">❌</a>
 </td>
 
 </form>
