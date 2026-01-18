@@ -16,13 +16,13 @@
         <input type="text" name="search" placeholder="Suchen nach ID / Name" value="{{ search }}">
         <button type="submit">Suchen</button>
 
+        <!-- Tagesfilter -->
         <div class="day-filters">
-            {% for i in range(1,6) %}
-            <label>
-                <input type="checkbox" name="day" value="Tag{{i}}" {% if "Tag"+i|string in selected_days %}checked{% endif %}>
-                Tag{{i}}
-            </label>
-            {% endfor %}
+            <label><input type="checkbox" name="day" value="Tag1" {% if "Tag1" in selected_days %}checked{% endif %}> Tag1</label>
+            <label><input type="checkbox" name="day" value="Tag2" {% if "Tag2" in selected_days %}checked{% endif %}> Tag2</label>
+            <label><input type="checkbox" name="day" value="Tag3" {% if "Tag3" in selected_days %}checked{% endif %}> Tag3</label>
+            <label><input type="checkbox" name="day" value="Tag4" {% if "Tag4" in selected_days %}checked{% endif %}> Tag4</label>
+            <label><input type="checkbox" name="day" value="Tag5" {% if "Tag5" in selected_days %}checked{% endif %}> Tag5</label>
         </div>
     </form>
 
