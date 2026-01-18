@@ -78,10 +78,10 @@ def index():
 
         
         
-        age, group = calculate_age_and_group(entry["Geburtsdatum"])
-        entry["Alter"] = age
-        entry["Gruppe"] = group
-        entry["Punkte"] = 0
+        # Nach Update der Geburtsdatum
+        age, group = calculate_age_and_group(r.get("Geburtsdatum", ""))
+        r["Alter"] = age
+        r["Gruppe"] = group
         
         data.append(entry)
         save_data(data)

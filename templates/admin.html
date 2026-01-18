@@ -32,7 +32,7 @@
     <th>Gruppe</th>
     <th>Strasse</th>
     <th>Ort</th>
-    <th>Verse</th>
+	<th>Tage / Verse</th>
     <th>Punkte</th>
     <th>Unterschrift</th>
     <th>Aktion</th>
@@ -57,13 +57,14 @@
 <td><input name="Nachname" value="{{ r.Nachname }}"></td>
 <td><input name="Notfallnummer" value="{{ r.Notfallnummer }}"></td>
 <td><input type="date" name="Geburtsdatum" value="{{ r.Geburtsdatum }}"></td>
-<td><input name="Alter" value="{{ r.Alter }}"></td>
-<td><input name="Gruppe" value="{{ r.Gruppe }}"></td>
+<td>{{ r.Alter }}></td>
+<td>{{ r.Gruppe }}></td>
 <td><input name="Strasse" value="{{ r.Strasse }}"></td>
 <td><input name="Ort" value="{{ r.Ort }}"></td>
 <td><input name="Postleitzahl" value="{{ r.Postleitzahl }}"></td>
 
 <td class="checkbox-line">
+<strong>Tag:</strong><br>
 {% for i in range(1,6) %}
 <label>
 <input type="checkbox" name="Tag{{i}}" {% if r["Tag"+i|string] %}checked{% endif %}>
@@ -71,6 +72,8 @@
 </label>
 {% endfor %}
 </td>
+
+<hr>
 
 <td class="checkbox-line">
 {% for i in range(1,6) %}
