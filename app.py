@@ -61,8 +61,8 @@ def index():
             "DSGVO": True
         }
 
-        # Initiale Tages- und Verse-Werte
-        for i in range(1, 6):
+        # Initiale Tag/Verse-Werte
+        for i in range(1,6):
             entry[f"Tag{i}"] = False
             entry[f"Verse{i}"] = False
 
@@ -91,7 +91,7 @@ def admin():
 
     data = load_data()
 
-    # Berechne Alter & Gruppe für alle
+    # Alter & Gruppe berechnen
     for r in data:
         age, group = calculate_age_and_group(r.get("Geburtsdatum", ""))
         r["Alter"] = age
@@ -141,14 +141,13 @@ def update_entry(reg_id):
 
             # Punkte berechnen: Summe Tag + Verse
             r["Punkte"] = sum(
-                r[f"Tag{i}"] + r[f"Verse{i}"] for i in range(1, 6)
+                r[f"Tag{i}"] + r[f"Verse{i}"] for i in range(1,6)
             )
 
             # Alter & Gruppe neu berechnen
             age, group = calculate_age_and_group(r.get("Geburtsdatum", ""))
             r["Alter"] = age
             r["Gruppe"] = group
-
             break
 
     save_data(data)
@@ -198,6 +197,7 @@ def export_excel():
 @app.route("/datenschutz")
 def datenschutz():
     return render_template("datenschutz.html")
+
 
 if __name__ == "__main__":
     app.run(debug=True)
