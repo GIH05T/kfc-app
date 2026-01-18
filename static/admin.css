@@ -1,9 +1,31 @@
-/* Top Bar */
+/* Grundlegendes Styling */
+body {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+}
+
+h1 {
+    margin-bottom: 10px;
+}
+
+/* Top-Bar */
 .top-bar {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 15px;
+}
+
+.export-btn {
+    background: #cc0000;
+    color: white;
+    padding: 8px 12px;
+    text-decoration: none;
+    border-radius: 4px;
+}
+
+.export-btn:hover {
+    background: #aa0000;
 }
 
 /* Filter-Form */
@@ -14,10 +36,21 @@
     flex-wrap: wrap;
 }
 
+.filter-form input[type="text"] {
+    padding: 5px;
+    font-size: 13px;
+    width: 200px;
+}
+
+.filter-form button {
+    padding: 5px 10px;
+    font-size: 13px;
+}
+
 /* Tagesfilter horizontal */
 .day-filters {
     display: flex;
-    gap: 10px;
+    gap: 8px;
     align-items: center;
 }
 
@@ -26,30 +59,91 @@
     align-items: center;
     gap: 3px;
     font-weight: normal;
+    font-size: 12px;
 }
 
 /* Tabelle */
 table {
-    width: 100%;
     border-collapse: collapse;
+    width: 100%;
+    font-size: 13px;
 }
 
 th, td {
-    border: 1px solid #ccc;
-    padding: 5px;
+    border: 1px solid #999;
+    padding: 6px;
+    vertical-align: top;
     text-align: center;
 }
 
+/* Zebra-Streifen */
+tbody tr:nth-child(odd) {
+    background: #f2f2f2;
+}
+
+tbody tr:nth-child(even) {
+    background: #e6e6e6;
+}
+
+/* Inputs & Selects */
+input, select {
+    width: 100%;
+    box-sizing: border-box;
+    font-size: 13px;
+}
+
+/* Checkboxen in Tabelle (Tag/Verse) */
 .checkbox-line {
     display: flex;
-    flex-direction: column;
-    align-items: flex-start;
+    flex-direction: column; /* übereinander */
+    align-items: center;
+    gap: 4px;
 }
 
+.checkbox-line label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 11px;
+    line-height: 1;
+}
+
+.checkbox-line input {
+    margin: 0;
+}
+
+/* Aktionen */
+.actions {
+    white-space: nowrap;
+}
+
+.save {
+    background: #7ccc00;
+    border: none;
+    padding: 5px 8px;
+    cursor: pointer;
+}
+
+.delete {
+    background: #cc0000;
+    color: white;
+    padding: 5px 8px;
+    text-decoration: none;
+    margin-left: 4px;
+}
+
+.delete:hover {
+    background: #aa0000;
+}
+
+/* Unterschrift */
+.signature-preview {
+    width: 80px;
+    height: auto;
+    border: 1px solid #aaa;
+}
+
+/* Punkte-Zelle */
 .punkte {
     font-weight: bold;
-}
-
-.actions button, .actions a {
-    margin: 2px;
 }
