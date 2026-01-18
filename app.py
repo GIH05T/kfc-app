@@ -24,22 +24,12 @@ def generate_id():
     data = load_data()
     return max([r["ID"] for r in data], default=0) + 1
 
-def calculate_age(birth):
-    try:
-        b = datetime.datetime.strptime(birth, "%Y-%m-%d").date()
-        today = datetime.date.today()
-        return today.year - b.year - ((today.month, today.day) < (b.month, b.day))
-    except:
-        return ""
-        
-# --- Alter & Gruppe berechnen ---
+# ---------------- Altersberechnung ----------------
 def calculate_age_and_group(birth):
     try:
         b = datetime.datetime.strptime(birth, "%Y-%m-%d").date()
         today = datetime.date.today()
-        age = today.year - birthdate.year - (
-            (today.month, today.day) < (birthdate.month, birthdate.day)
-        )
+        age = today.year - b.year - ((today.month, today.day) < (b.month, b.day))
         if 5 <= age <= 7:
             group = "5-7"
         elif 8 <= age <= 13:
@@ -71,18 +61,17 @@ def index():
             "DSGVO": True
         }
 
-        # Initiale Tages-/Verswerte
+        # Initiale Tages- und Verse-Werte
         for i in range(1, 6):
             entry[f"Tag{i}"] = False
             entry[f"Verse{i}"] = False
 
-        
-        
-        # Nach Update der Geburtsdatum
-        age, group = calculate_age_and_group(r.get("Geburtsdatum", ""))
-        r["Alter"] = age
-        r["Gruppe"] = group
-        
+        # Alter & Gruppe berechnen
+        age, group = calculate_age_and_group(entry["Geburtsdatum"])
+        entry["Alter"] = age
+        entry["Gruppe"] = group
+        entry["Punkte"] = 0
+
         data.append(entry)
         save_data(data)
         return redirect(url_for("success", reg_id=reg_id))
@@ -93,7 +82,7 @@ def index():
 def success():
     return render_template("success.html", reg_id=request.args.get("reg_id"))
 
-# --- Admin ---
+# ---------------- Admin ----------------
 @app.route("/admin", methods=["GET"])
 def admin():
     pw = request.args.get("pw")
@@ -101,15 +90,15 @@ def admin():
         return "Zugriff verweigert", 403
 
     data = load_data()
-    
+
+    # Berechne Alter & Gruppe für alle
     for r in data:
         age, group = calculate_age_and_group(r.get("Geburtsdatum", ""))
         r["Alter"] = age
         r["Gruppe"] = group
-    
-    search = request.args.get("search", "").lower()
-    day_filter = request.args.get("day", "")
 
+    # Suchfilter
+    search = request.args.get("search", "").lower()
     if search:
         data = [
             r for r in data
@@ -118,18 +107,23 @@ def admin():
             or search in r["Nachname"].lower()
         ]
 
-    if day_filter:
-        data = [r for r in data if r.get(day_filter)]
+    # Tagesfilter (Checkboxen)
+    selected_days = request.args.getlist("day")
+    if selected_days:
+        data = [
+            r for r in data
+            if any(r.get(day) for day in selected_days)
+        ]
 
     return render_template(
         "admin.html",
         registrations=data,
         pw=pw,
         search=search,
-        day_filter=day_filter
+        selected_days=selected_days
     )
-    
-# --- Update Eintrag ---
+
+# ---------------- Update ----------------
 @app.route("/update/<int:reg_id>", methods=["POST"])
 def update_entry(reg_id):
     pw = request.args.get("pw")
@@ -145,14 +139,22 @@ def update_entry(reg_id):
                 elif key in request.form:
                     r[key] = request.form.get(key)
 
+            # Punkte berechnen: Summe Tag + Verse
             r["Punkte"] = sum(
                 r[f"Tag{i}"] + r[f"Verse{i}"] for i in range(1, 6)
             )
+
+            # Alter & Gruppe neu berechnen
+            age, group = calculate_age_and_group(r.get("Geburtsdatum", ""))
+            r["Alter"] = age
+            r["Gruppe"] = group
+
             break
 
     save_data(data)
     return redirect(url_for("admin", pw=pw))
 
+# ---------------- Delete ----------------
 @app.route("/delete/<int:reg_id>")
 def delete_entry(reg_id):
     pw = request.args.get("pw")
@@ -163,6 +165,7 @@ def delete_entry(reg_id):
     save_data(data)
     return redirect(url_for("admin", pw=pw))
 
+# ---------------- Export Excel ----------------
 @app.route("/export_excel")
 def export_excel():
     pw = request.args.get("pw")
@@ -173,7 +176,7 @@ def export_excel():
     wb = Workbook()
     ws = wb.active
 
-    headers = list(data[0].keys())
+    headers = list(data[0].keys()) if data else []
     ws.append(headers)
 
     row = 2
@@ -191,6 +194,10 @@ def export_excel():
     wb.save("export.xlsx")
     return send_file("export.xlsx", as_attachment=True)
 
+# ---------------- Datenschutz ----------------
 @app.route("/datenschutz")
 def datenschutz():
     return render_template("datenschutz.html")
+
+if __name__ == "__main__":
+    app.run(debug=True)

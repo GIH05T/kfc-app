@@ -10,9 +10,16 @@
 <h1>KFC – Adminbereich</h1>
 
 <div class="top-bar">
-    <form method="get">
+    <form method="get" class="filter-form">
         <input type="hidden" name="pw" value="{{ pw }}">
-        <input type="text" name="search" placeholder="Suchen nach ID / Name" value="{{ search_query }}">
+
+        <input
+            type="text"
+            name="search"
+            placeholder="Suchen nach ID / Name"
+            value="{{ search }}"
+        >
+
         <button type="submit">Suchen</button>
     </form>
 
@@ -26,13 +33,13 @@
     <th>Gesch.</th>
     <th>Vorname</th>
     <th>Nachname</th>
-	<th>Notfallnummer</th>
+    <th>Notfallnummer</th>
     <th>Geburtsdatum</th>
     <th>Alter</th>
     <th>Gruppe</th>
     <th>Strasse</th>
     <th>Ort</th>
-	<th>Tage / Verse</th>
+    <th>Tage / Verse</th>
     <th>Punkte</th>
     <th>Unterschrift</th>
     <th>Aktion</th>
@@ -48,8 +55,8 @@
 
 <td>
 <select name="Geschlecht">
-    <option value="m" {% if r.Geschlecht=="m" %}selected{% endif %}>m</option>
-    <option value="w" {% if r.Geschlecht=="w" %}selected{% endif %}>w</option>
+    <option value="m" {% if r.Geschlecht == "m" %}selected{% endif %}>m</option>
+    <option value="w" {% if r.Geschlecht == "w" %}selected{% endif %}>w</option>
 </select>
 </td>
 
@@ -57,28 +64,28 @@
 <td><input name="Nachname" value="{{ r.Nachname }}"></td>
 <td><input name="Notfallnummer" value="{{ r.Notfallnummer }}"></td>
 <td><input type="date" name="Geburtsdatum" value="{{ r.Geburtsdatum }}"></td>
-<td>{{ r.Alter }}></td>
-<td>{{ r.Gruppe }}></td>
+
+<td>{{ r.Alter }}</td>
+<td>{{ r.Gruppe }}</td>
+
 <td><input name="Strasse" value="{{ r.Strasse }}"></td>
 <td><input name="Ort" value="{{ r.Ort }}"></td>
-<td><input name="Postleitzahl" value="{{ r.Postleitzahl }}"></td>
 
 <td class="checkbox-line">
 <strong>Tag:</strong><br>
 {% for i in range(1,6) %}
 <label>
-<input type="checkbox" name="Tag{{i}}" {% if r["Tag"+i|string] %}checked{% endif %}>
+<input type="checkbox" name="Tag{{ i }}" {% if r["Tag"+i|string] %}checked{% endif %}>
 {{ i }}
 </label>
 {% endfor %}
-</td>
 
 <hr>
 
-<td class="checkbox-line">
+<strong>Verse:</strong><br>
 {% for i in range(1,6) %}
 <label>
-<input type="checkbox" name="Verse{{i}}" {% if r["Verse"+i|string] %}checked{% endif %}>
+<input type="checkbox" name="Verse{{ i }}" {% if r["Verse"+i|string] %}checked{% endif %}>
 {{ i }}
 </label>
 {% endfor %}
